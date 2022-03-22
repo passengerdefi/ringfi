@@ -118,7 +118,7 @@ export class Reactor {
    * @returns string
    */
   static getMainnetURI = (networkId: number): string => { 
-    return  "https://polygon-mainnet.infura.io/v3/1030b8cbec174e90a95d512d970c2a0e";
+    return  "https://api.avax.network/ext/bc/C/rpc/";
   };
 
   /**
