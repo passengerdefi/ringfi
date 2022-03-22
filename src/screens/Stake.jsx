@@ -40,7 +40,7 @@ export default function Stake(props) {
 
   const theme = useMantineTheme();
   const [opened, setOpened] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const [poolId, setPoolId] = useState(1);
 
@@ -225,7 +225,7 @@ export default function Stake(props) {
         </Group>
       </Card>
       <div style={{ position: "relative" }}>
-        <LoadingOverlay visible={loading} />
+        <LoadingOverlay visible={loading}  style={{zIndex:+10}}/>
 
         <Card shadow="lg" style={{ marginTop: 10, backgroundColor: "#282942" }}>
           <Group position="left" style={{ marginBottom: 5 }}>
