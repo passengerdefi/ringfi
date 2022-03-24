@@ -15,7 +15,7 @@ import {
   ActionIcon,
   Grid,
 } from "@mantine/core";
-import { useAppSelector } from "../hooks";
+import { useAppSelector,useWeb3Context } from "../hooks";
 import { useSelector, useDispatch } from "react-redux";
 
 import { Settings } from "tabler-icons-react";
@@ -34,7 +34,7 @@ import { useNotifications } from "@mantine/notifications";
 import staking from "../abi/staking.json";
 
 export default function Stake(props) {
-  const address = useAddress();
+  const { provider, address, connected, connect, chainID } = useWeb3Context();
   const dispatch = useDispatch();
   const notifications = useNotifications();
 
@@ -63,12 +63,8 @@ export default function Stake(props) {
 
   const [userStakeBalance, setUserStakeBalance] = useState('');
 
-  const [userClaimableBalance, setUserClaimableBalance] = useState('');
-
-
-
-  const provider = new ethers.providers.Web3Provider(window.ethereum);
-
+  const [userClaimableBalance, setUserClaimableBalance] = useState(''); 
+ 
   const pendingTransactions = useSelector((state) => {
     return state.pendingTransactions;
   });
@@ -210,13 +206,13 @@ export default function Stake(props) {
         style={{ marginTop: 10, backgroundColor: "#303250" }}
       >
         <Group position="apart" style={{ marginBottom: 5 }}>
-          <Title order={5} align={"center"}>
+          <Title order={5} align={"center"}  style={{color:'#969bd5' }}>
             Select pool
           </Title>
           <ActionIcon
             color="violet"
             size="lg"
-            radius="xs"
+            radius="lg"
             variant="filled"
             onClick={() => setOpened(true)}
           >
@@ -234,12 +230,12 @@ export default function Stake(props) {
               src={stakingTokenLogo}
               alt="Token image"
             />
-            <Title order={4} align={"center"} >
+            <Title order={4} align={"center"}   style={{color:'#969bd5' }}>
               Stake {stakingTokenName}
             </Title>
           </Group>
           <Group position="apart" style={{ marginBottom: 15 }}>
-            <Title order={6} align={"left"} >
+            <Title order={6} align={"left"}   style={{color:'#969bd5' }}>
               APR :{" "}
               <span style={{ color: theme.colors.blue[3] }}>
                 {" "}
@@ -258,7 +254,7 @@ export default function Stake(props) {
             withBorder
             style={{ marginTop: 10, backgroundColor: "#303250", border: 0 }}
           >
-            <Title order={6} style={{ marginBottom: 10}}>
+            <Title order={6} style={{ marginBottom: 10,color:'#969bd5' }}>
               Balance : {userTokenBalance} {stakingTokenName}
             </Title>
 
@@ -294,7 +290,7 @@ export default function Stake(props) {
                     variant="gradient"
                     gradient={{ from: "orange", to: "red" }}
                     size="xs"
-                    radius="xs"
+                    radius="md"
                     fullWidth
                     loading={isPendingTxn(
                       pendingTransactions,
@@ -316,7 +312,7 @@ export default function Stake(props) {
                     variant="gradient"
                     gradient={{ from: "indigo", to: "violet" }}
                     size="xs"
-                    radius="xs"
+                    radius="md"
                     fullWidth
                     onClick={() => {
                       onStakeToken(
@@ -341,7 +337,7 @@ export default function Stake(props) {
             withBorder
             style={{ marginTop: 10, backgroundColor: "#303250", border: 0 }}
           >
-            <Title order={6} style={{ marginBottom: 10 }}>
+            <Title order={6} style={{ marginBottom: 10 ,color:'#969bd5' }}>
               Deposited : {userStakeBalance} {stakingTokenName}
             </Title>
             <Grid columns={24}>
@@ -373,7 +369,7 @@ export default function Stake(props) {
                   variant="gradient"
                   gradient={{ from: "indigo", to: "violet" }}
                   size="xs"
-                  radius="xs"
+                  radius="md"
                   fullWidth
                   
                   onClick={() => {
@@ -412,7 +408,7 @@ export default function Stake(props) {
               <Title
                 order={6}
                 align={"center"}
-                style={{ marginBottom: 10}}
+                style={{ marginBottom: 10  , color:'#969bd5' }}
               >
                 Claimable: {userClaimableBalance} {poolContractName}
               </Title>
@@ -422,7 +418,7 @@ export default function Stake(props) {
                 variant="gradient"
                 gradient={{ from: "indigo", to: "violet" }}
                 size="xs"
-                radius="xs"
+                radius="md"
                 
                   
                 onClick={() => {
@@ -445,11 +441,10 @@ export default function Stake(props) {
         centered
         onClose={() => setOpened(false)}
         title="Select Pool to Stake"
-        style={{
-          background: "#282942",
-          fontSize: 16,
-          fontWeight: "bold",
-          color: "white",
+        styles={{  
+          root: {   backgroundColor: "#303250", border: 0  },
+          inner: {   backgroundColor: "#303250", border: 0  },
+          modal: {  backgroundColor: "#303250", border: 0 }, 
         }}
       >
         {stakingInfo &&
@@ -458,7 +453,7 @@ export default function Stake(props) {
               shadow="lg"
               radius="lg"
               key={pool.poolId}
-              style={{ marginTop: 10, backgroundColor: "#0f2247" }}
+              style={{backgroundColor: "#4e5076"}}
               onClick={() => {
                 setPoolId(pool.poolId);
                 setOpened(false);
@@ -471,7 +466,8 @@ export default function Stake(props) {
                   src={pool.poolContractLogo}
                   alt="Token image"
                 />
-                <Text weight={500}>{pool.poolContractName}</Text>
+                <Title order={5}   style={{color:'#969bd5' }}>
+                  {pool.poolContractName}</Title>
               </Group>
             </Card>
           ))}

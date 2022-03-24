@@ -1,12 +1,9 @@
 import { useAddress, useWeb3Context } from "../hooks/web3Context";
 import { abi as ierc20Abi } from "../abi/IERC20.json";
-import staking from "../abi/staking.json";
-
-import { IERC20 } from "../typechain";
-import { BigNumber, ethers } from "ethers";
-import { BNToEther, toBN } from "../handlers";
-
+import staking from "../abi/staking.json"; 
+import { BigNumber, ethers } from "ethers"; 
 import contracts from "../abi/subzero_deployments.json";
+ 
 
 import {
   getBalance,
@@ -38,6 +35,9 @@ export const tokenBalance = async (
   const userBalance = await tokenContract.balanceOf(address);
   return userBalance;
 };
+
+
+
 
 export const userAllowance = async (
   provider: any,
@@ -73,7 +73,7 @@ export const poolStatistics = async (
     provider
   );
 
-  const depositTokenPrice = await getDepositTokenPriceInDollars(
+  const depositTokenPrice = await getTokenPriceInDollars(
     stakingTokenAddress
   );
 
@@ -126,10 +126,27 @@ export const poolStatistics = async (
   };
 };
 
-export const getDepositTokenPriceInDollars = async (
+export const getTokenPriceInDollars = async (
   stakingTokenAddress: string
 ) => {
   const APIURL = "https://api.traderjoexyz.com/priceusd/" + stakingTokenAddress;
+  const res = await fetch(APIURL);
+  const data = await res.json();
+
+  const value = BigNumber.from(data.toString());
+
+  const value1 = ethers.utils.formatEther(value);
+
+  console.log(value1);
+
+  return value1;
+};
+
+
+export const getTokenPriceInAvax = async (
+  stakingTokenAddress: string
+) => {
+  const APIURL = "https://api.traderjoexyz.com/priceavax/" + stakingTokenAddress;
   const res = await fetch(APIURL);
   const data = await res.json();
 

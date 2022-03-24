@@ -117,7 +117,7 @@ export class Reactor {
    * "intelligently" loadbalances production API Keys
    * @returns string
    */
-  static getMainnetURI = (networkId: number): string => { 
+  static getMainnetURI = (): string => { 
     return  "https://api.avax.network/ext/bc/C/rpc/";
   };
 
@@ -128,7 +128,7 @@ export class Reactor {
    * @returns StaticJsonRpcProvider for querying
    */
   static getMainnetStaticProvider = () => {
-    return new StaticJsonRpcProvider(Reactor.getMainnetURI(137));
+    return new StaticJsonRpcProvider(Reactor.getMainnetURI());
   };
 
   /**

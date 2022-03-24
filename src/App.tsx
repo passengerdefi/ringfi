@@ -22,7 +22,7 @@ import Swap from "./screens/Swap";
 const PARSE_LIVE_QUERY_URL: string = (REACT_APP_PARSE_LIVE_QUERY_URL as string);
 const PARSE_APPLICATION_ID: string = (REACT_APP_PARSE_APPLICATION_ID as string);
 const PARSE_JAVASCRIPT_KEY: string = (REACT_APP_PARSE_JAVASCRIPT_KEY as string); 
-
+ 
  
 initializeParse(
   PARSE_LIVE_QUERY_URL,
@@ -34,7 +34,7 @@ console.log("Parse Initialized with parameter -",REACT_APP_PARSE_APPLICATION_ID,
 
 function App() {
 
-  const [action, setAction] = useState("stake");
+  const [action, setAction] = useState("swap");
   const location = useLocation();
   const dispatch = useDispatch();
 
@@ -127,7 +127,7 @@ function App() {
       <Header/>
       <SegmentedControl fullWidth color="blue"   transitionDuration={1000}
           name="action"
-          defaultValue="stake"
+          defaultValue="swap"
           style={{ margin: 16, backgroundColor:"#303250" }}
           onChange={(val: React.SetStateAction<string>) => setAction(val)}
           data={[

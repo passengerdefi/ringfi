@@ -6,7 +6,8 @@ import { IFrameEthereumProvider } from "@ledgerhq/iframe-provider";
  import store from "../store";
 import { Reactor } from "../reactors/Reactor";
 import { NETWORKS } from "../appconfig";
-
+import { Signer } from "ethers";
+ 
 /**
  * determine if in IFrame for Ledger Live
  */
@@ -23,7 +24,7 @@ type onChainProvider = {
   hasCachedProvider: () => boolean;
   address: string;
   connected: boolean;
-  provider: JsonRpcProvider;
+  provider: JsonRpcProvider; 
   web3Modal: Web3Modal;
   chainChanged: Boolean;
   onChainChangeComplete: () => void;
@@ -74,10 +75,11 @@ export const Web3ContextProvider: React.FC<{ children: ReactElement }> = ({ chil
   const [address, setAddress] = useState("");
   // NOTE (appleseed): loading eth mainnet as default rpc provider for a non-connected wallet
   const [provider, setProvider] = useState<JsonRpcProvider>(Reactor.getMainnetStaticProvider());
+ 
   const [chainChanged, setChainChanged] = useState(true);
-
+  const [signer, setSigner] = useState<Signer>();
   const [web3Modal, setWeb3Modal] = useState<Web3Modal>(initModal);
-
+ 
   const hasCachedProvider = (): boolean => {
     if (!web3Modal) return false;
     if (!web3Modal.cachedProvider) return false;
@@ -129,7 +131,7 @@ export const Web3ContextProvider: React.FC<{ children: ReactElement }> = ({ chil
     // Eventually we'll be fine without doing network validations.
     setAddress(connectedAddress);
 
-    // Keep this at the bottom of the method, to ensure any repaints have the data we need
+     // Keep this at the bottom of the method, to ensure any repaints have the data we need
     setConnected(true);
 
     return connectedProvider;
@@ -149,7 +151,7 @@ export const Web3ContextProvider: React.FC<{ children: ReactElement }> = ({ chil
       connect,
       disconnect,
       hasCachedProvider,
-      provider,
+      provider, 
       connected,
       address,
       web3Modal,
@@ -160,7 +162,7 @@ export const Web3ContextProvider: React.FC<{ children: ReactElement }> = ({ chil
       connect,
       disconnect,
       hasCachedProvider,
-      provider,
+      provider, 
       connected,
       address,
       web3Modal,
