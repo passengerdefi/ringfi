@@ -1,3 +1,19 @@
+
+@font-face {
+  font-family: 'Varela Round';
+  font-style: normal;
+  font-weight: 400;
+  src: url('./assets/fonts/varela-round-v18-latin-regular.eot'); /* IE9 Compat Modes */
+  src: local(''),
+       url('./assets/fonts/varela-round-v18-latin-regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('./assets/fonts/varela-round-v18-latin-regular.woff2') format('woff2'), /* Super Modern Browsers */
+       url('./assets/fonts/varela-round-v18-latin-regular.woff') format('woff'), /* Modern Browsers */
+       url('./assets/fonts/varela-round-v18-latin-regular.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('./assets/fonts/varela-round-v18-latin-regular.svg#VarelaRound') format('svg'); /* Legacy iOS */
+}
+
+
+
 body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -17,3 +33,4 @@ body {
   justify-content: center;
   align-items: center;
 } 
+

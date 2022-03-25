@@ -16,9 +16,9 @@ const myTheme: MantineThemeOverride = {
   colorScheme: 'dark',
   primaryColor: 'brand',
   defaultRadius: 10,
-  fontFamily: 'Poppins, sans-serif',
-  fontFamilyMonospace: 'Poppins, Courier, monospace',
-  headings: { fontFamily: 'Poppins, sans-serif' },
+  fontFamily: 'Varela Round, sans-serif',
+  fontFamilyMonospace: 'Varela Round, Courier, monospace',
+  headings: { fontFamily: 'Varela Round, sans-serif' },
   colors: {
     brand: ['#969bd5', '#969bd5', '#d0bfff', '#b197fc', '#9775fa', '#845ef7', '#7950f2', '#7048e8', '#6741d9', '#5f3dc4'],
   },
