@@ -63,6 +63,7 @@ export const changeApproval = createAsyncThunk(
     } catch (e: unknown) { 
 
       notifications.showNotification({
+        color: 'red',
         title: 'Error.',
         message: (e as IJsonRPCError).message,
       })
@@ -128,6 +129,7 @@ export const stakeToken = createAsyncThunk(
     } catch (e: unknown) { 
 
       notifications.showNotification({
+        color: 'red',
         title: 'Error.',
         message: (e as IJsonRPCError).message,
       })

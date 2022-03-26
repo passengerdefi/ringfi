@@ -26,6 +26,13 @@ export const pegTokenD=18;
 export const BASE_TOKEN="0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"; 
 
  
+export enum SupportedChainId {
+  BSC = 56,
+  MATIC = 137,
+  AVAX = 43114,
+}
+
+
 export enum NetworkId {
  // MAINNET = 1,
  // TESTNET_RINKEBY = 4, 
@@ -41,6 +48,17 @@ export enum NetworkId {
 
   Localhost = 1337,
 }
+
+
+
+export const FACTORY_ADDRESSES: {
+  [chainId: number]: string;
+} = {
+  [SupportedChainId.BSC]: "0xcA143Ce32Fe78f1f7019d7d551a6402fC5350c73",
+  [SupportedChainId.MATIC]: "0x5757371414417b8C6CAad45bAeF941aBc7d3Ab32",
+  [SupportedChainId.AVAX]: "0x9Ad6C38BE94206cA50bb0d90783181662f0Cfa10",
+};
+
 
 interface IPoolGraphURLS {
   [index: string]: string;
@@ -184,12 +202,7 @@ const config: Config = {
     "0x0bbca9af0511ad1a1da383135cf3a8d2ac620e549ef9f6ae3a4c33c2fed0af91",
   PUBLIC_URL: process.env.PUBLIC_URL + "/" || "/",
 };
-
-const localStorageKey = {
-  lastWallet: "lastWallet",
-  lastChainId: "lastChainId",
-  transactionSetting: "transactionSetting",
-};
+ 
 
 const erc = parseInt(process.env.REACT_APP_ERC_CHAIN || "1", 10);
 const bep = parseInt(process.env.REACT_APP_BEP_CHAIN || "56", 10);
@@ -202,18 +215,15 @@ const chain = {
   polygon: isNaN(polygon) ? 137 : polygon,
   avax: isNaN(avax) ? 43114 : avax,
 };
+ 
+ 
 
-const etherMethods: { [key: string]: EtherMethods } = {
-  [chain.avax]: {
-    swapETHForExactTokens: "swapAVAXForExactTokens",
-    swapExactETHForTokens: "swapExactAVAXForTokens",
-    swapExactETHForTokensSupportingFeeOnTransferTokens:
-      "swapExactAVAXForTokensSupportingFeeOnTransferTokens",
-    swapExactTokensForETH: "swapExactTokensForAVAX",
-    swapExactTokensForETHSupportingFeeOnTransferTokens:
-      "swapExactTokensForAVAXSupportingFeeOnTransferTokens",
-    swapTokensForExactETH: "swapTokensForExactAVAX",
-  },
+export const ROUTERS: { [chainId: number]: string } = {
+  [SupportedChainId.BSC]: config.PANCAKE_ROUTER,
+  [SupportedChainId.MATIC]: config.QUICK_SWAP_ROUTER,
+  [SupportedChainId.AVAX]: config.TRADER_JOE_ROUTER,
 };
 
-export { config, localStorageKey, chain, etherMethods };
+
+
+export { config,chain };
