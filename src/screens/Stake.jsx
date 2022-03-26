@@ -32,6 +32,11 @@ import { changeApproval, stakeToken,unstakeToken } from "../functions/AppStakerI
 import { isPendingTxn, txnButtonText } from "../reducers/PendingTxnsSlice";
 import { useNotifications } from "@mantine/notifications";
 import staking from "../abi/staking.json";
+import {
+  getBalance,
+  getDisplayBalance,
+  getFullDisplayBalance,
+} from "../utils/formatBalance";
 
 export default function Stake(props) {
   const { provider, address, connected, connect, chainID } = useWeb3Context();
@@ -169,8 +174,8 @@ export default function Stake(props) {
 
 
 
-    setUserTokenBalance(ethers.utils.formatEther(userBalance));
-    setAllowance(ethers.utils.formatEther(allowance));
+    setUserTokenBalance(getFullDisplayBalance(userBalance));
+    setAllowance(getFullDisplayBalance(allowance));
 
     setAppId(poolInfo.appId);
     setStakingAPY(yearlyAPR);
