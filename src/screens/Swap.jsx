@@ -20,7 +20,7 @@ import { Settings } from "tabler-icons-react";
 import { useAddress } from "../hooks/web3Context";
 import { ethers } from "ethers";
 import bnbLogo from '../assets/tokens/bnb.png'
-import ravenLogo from '../assets/tokens/bomb1.png'
+import bombLogo from '../assets/tokens/bomb1.png'
 import { getTokenPriceInbnb, getTokenPriceInRaven } from '../functions/OneInchApi';
 import { tokenBalance } from '../functions/Getstatistics';
 import { BASE_TOKEN,   REACT_APP_SUPPORTED_CHAINID } from "../appconfig";
@@ -38,9 +38,9 @@ import ERC20 from "../functions/ERC20";
 
 
 
-const RAVEN = new Token(
+const BOMB = new Token(
     REACT_APP_SUPPORTED_CHAINID,
-    '0x4154a93ef4dB1e0C3fbb22bda0E36249453E319e',
+    '0x522348779DCb2911539e76A1042aA922F9C47Ee3',
     18
 );
 
@@ -64,9 +64,9 @@ export default function Swap(props) {
 
 
      const [loading, setLoading] = useState(false);
-    const [ravenPrice, setravenPrice] = useState(0);
+    const [bombPrice, setbombPrice] = useState(0);
     const [userbnbBalance, setUserbnbBalance] = useState(0);
-    const [ravenBalance, setRavenBalance] = useState(0);
+    const [bombBalance, setRavenBalance] = useState(0);
     const [payValue, setPayValue] = useState(0)
     const [buyValue, setBuyValue] = useState(0);
 
@@ -79,7 +79,7 @@ export default function Swap(props) {
 
      
  
-         const path = [WETH9.address, RAVEN.address];
+         const path = [WETH9.address, BOMB.address];
    
 
         const router = new ethers.Contract(
@@ -182,9 +182,9 @@ export default function Swap(props) {
     const setSwapparametersPay = (value) => {
         setPayValue(value);
 
-        if (value && value > 0) tokenValuebnb(RAVEN.address, value).then((price) => setBuyValue(Number(price).toFixed(4)));
+        if (value && value > 0) tokenValuebnb(BOMB.address, value).then((price) => setBuyValue(Number(price).toFixed(4)));
         else { setBuyValue(0); setSwapEnabled(false); return; }
-        const buyValuechanged = value * ravenPrice;
+        const buyValuechanged = value * bombPrice;
         console.log(buyValuechanged);
         setSwapEnabled(true); return;
     }
@@ -193,7 +193,7 @@ export default function Swap(props) {
 
         setBuyValue(value);
 
-        if (value && value > 0) tokenValueRaven(RAVEN.address, value).then((price) => setPayValue(Number(price).toFixed(4)));
+        if (value && value > 0) tokenValueRaven(BOMB.address, value).then((price) => setPayValue(Number(price).toFixed(4)));
         else { setPayValue(0); setSwapEnabled(false); return; }
         setSwapEnabled(true); return;
 
@@ -203,10 +203,10 @@ export default function Swap(props) {
 
     const ApproveSZ = async () => {
 
-        const RAVENCONTRACT = new ERC20(RAVEN.address, signer, 'RAVEN', 18);
+        const BOMBCONTRACT = new ERC20(BOMB.address, signer, 'BOMB', 18);
 
         try {
-            await RAVENCONTRACT.approve(ROUTERS[REACT_APP_SUPPORTED_CHAINID], '100000000000000000000000');
+            await BOMBCONTRACT.approve(ROUTERS[REACT_APP_SUPPORTED_CHAINID], '100000000000000000000000');
         } catch (err) {
 
             console.log(err.message)
@@ -278,9 +278,9 @@ export default function Swap(props) {
 
     const isRavenApproved = async () => {
 
-        const RAVENCONTRACT = new ERC20(RAVEN.address, signer, 'RAVEN', 18);
+        const BOMBCONTRACT = new ERC20(BOMB.address, signer, 'BOMB', 18);
 
-        const allowance = await RAVENCONTRACT.allowance(address, ROUTERS[REACT_APP_SUPPORTED_CHAINID]);
+        const allowance = await BOMBCONTRACT.allowance(address, ROUTERS[REACT_APP_SUPPORTED_CHAINID]);
         console.log(allowance);
         if (allowance.lte(0)) {
             return false;
@@ -296,15 +296,15 @@ export default function Swap(props) {
         if (address) {
 
 
-            const ravenPrice = await getTokenPriceInbnb(RAVEN.address, amount);
-            // console.log(ravenPrice);
-            setravenPrice(Number(ravenPrice).toFixed(4));
+            const bombPrice = await getTokenPriceInbnb(BOMB.address, amount);
+            // console.log(bombPrice);
+            setbombPrice(Number(bombPrice).toFixed(4));
 
 
             const userbnbBalance = await provider.getBalance(address)
             setUserbnbBalance(Number(ethers.utils.formatEther(userbnbBalance)).toFixed(4));
 
-            const rBalance = await tokenBalance(provider, address, RAVEN.address)
+            const rBalance = await tokenBalance(provider, address, BOMB.address)
             setRavenBalance(Number(ethers.utils.formatEther(rBalance)).toFixed(4));
 
 
@@ -342,7 +342,7 @@ export default function Swap(props) {
             >
                 <Group position="center" style={{ marginBottom: 5 }}>
                     <Title order={5} align={"center"} style={{ color: '#969bd5' }}>
-                        Swap BNB for RAVEN
+                        Swap BNB for BOMB
                     </Title>
                 </Group>
 
@@ -393,7 +393,7 @@ export default function Swap(props) {
                                 To</Text>
 
                             <Text style={{ color: '#969bd5', fontSize: "10" }}>
-                                Balance: {ravenBalance && ravenBalance}</Text>
+                                Balance: {bombBalance && bombBalance}</Text>
 
                         </Group>
                         <Input
@@ -411,11 +411,11 @@ export default function Swap(props) {
                                 <Group position="right">
                                     <Image
                                         style={{ height: 32, width: 32 }}
-                                        src={ravenLogo}
+                                        src={bombLogo}
                                         alt="Token image"
                                     />
                                     <Title order={5} style={{ color: '#969bd5' }}>
-                                    RAVEN</Title>
+                                    BOMB</Title>
 
                                 </Group>
                             }
@@ -431,7 +431,7 @@ export default function Swap(props) {
                         Price</Text>
 
                     <Text style={{ color: '#969bd5' }}>
-                        {ravenPrice && ravenPrice} RAVEN per BNB</Text>
+                        {bombPrice && bombPrice} BOMB per BNB</Text>
 
                 </Group>
                 {userbnbBalance && userbnbBalance > 0 &&
