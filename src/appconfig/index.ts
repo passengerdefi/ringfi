@@ -1,29 +1,26 @@
-import { Reactor } from "../reactors/Reactor";
-import { EnvHelper } from "../reactors/Environment";
-import ethereum from "../assets/tokens/wETH.svg"; 
-import avalanche from "../assets/tokens/AVAX.svg";
-import { EtherMethods } from "custom-uniswap-v2-sdk";
+ 
 
 export const THE_GRAPH_URL = "https://api.thegraph.com/subgraphs/name/drondin/olympus-graph";
 export const EPOCH_INTERVAL = 2200;
+
+
+
+export enum APPFEATURES{
+  SWAP,
+  STAKEANDSWAP,
+  DASHBOARD,
+}
+
 
 // NOTE could get this from an outside source since it changes slightly over time
 export const BLOCK_RATE_SECONDS = 13.14;
 
 export const TOKEN_DECIMALS = 9;
 const PARTNER = "codejacks";
-const SLIPPAGE = 1; // 1%
-
-export const APP_ID: number = 1601;
-export const APP_REST_KEY:string="f0rhgO7LRqLgkPPvcxT6FCL53hSGYjnlBWuWkSFfrZHVYoLN8UmKCuiQQPkDbltn";
-export const REACT_APP_PARSE_APPLICATION_ID: string  = "7fQoav9Cet578x3JRzGyc3846jzs2C2Sj3GieCGR"
-export const REACT_APP_PARSE_JAVASCRIPT_KEY: string  = "kVOoz1N9FYSenWzK1wpY2CtJZuD0BJmxaavp32Ue"
-export const REACT_APP_PARSE_LIVE_QUERY_URL: string  = "https://parseapi.back4app.com"
-export const REACT_APP_SUPPORTED_CHAINID: number=43114
-export const pegTokenName="TOMB";
-export const pegTokenAddress="0xb84527d59b6ecb96f433029ecc890d4492c5dce1";
-export const pegTokenD=18;
+const SLIPPAGE = 1;  
+export const APPTYPE : APPFEATURES = APPFEATURES.SWAP; 
 export const BASE_TOKEN="0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"; 
+export const REACT_APP_SUPPORTED_CHAINID=56;
 
  
 export enum SupportedChainId {
@@ -48,28 +45,8 @@ export enum NetworkId {
 
   Localhost = 1337,
 }
-
-
-
-export const FACTORY_ADDRESSES: {
-  [chainId: number]: string;
-} = {
-  [SupportedChainId.BSC]: "0xcA143Ce32Fe78f1f7019d7d551a6402fC5350c73",
-  [SupportedChainId.MATIC]: "0x5757371414417b8C6CAad45bAeF941aBc7d3Ab32",
-  [SupportedChainId.AVAX]: "0x9Ad6C38BE94206cA50bb0d90783181662f0Cfa10",
-};
-
-
-interface IPoolGraphURLS {
-  [index: string]: string;
-}
-
-export const POOL_GRAPH_URLS: IPoolGraphURLS = {
-  4: "https://api.thegraph.com/subgraphs/name/pooltogether/rinkeby-v3_4_3",
-  1: "https://api.thegraph.com/subgraphs/name/pooltogether/pooltogether-v3_4_3",
-  56: "https://api.thegraph.com/subgraphs/name/pooltogether/bsc-v3_4_3",
-};
-
+ 
+ 
 interface IAddresses {
   [key: number]: { [key: string]: string };
 }
@@ -89,19 +66,145 @@ interface INetwork {
   chainId: number;
   nativeCurrency: INativeCurrency;
   rpcUrls: string[];
-  blockExplorerUrls: string[];
-  image: string;
-  imageAltText: string;
-  uri: () => string;
+  blockExplorerUrls: string[];  
+} 
+
+export declare enum ChainId {
+  MAINNET = 1,
+  ROPSTEN = 3,
+  RINKEBY = 4,
+  GÖRLI = 5,
+  KOVAN = 42,
+  MATIC = 137,
+  MUMBAI = 80001,
+  BSCTESTNET = 97,
+  BSCMAINNET = 56,
+  AVAXTESTNET = 43113,
+  AVAXMAINNET = 43114,
+  FANTOM = 250,
+  CRONOSTESTNET = 338,
+  CRONOS = 25,
+  ARBITRUM = 42161,
+  ARBITRUM_TESTNET = 421611,
+  BTTC = 199,
+  VELAS = 106
 }
+/*
+export const ADD_NETWORK_PARAMS: {
+  [chainId in ChainId]?: {
+    chainId: string
+    chainName: string
+    nativeCurrency: {
+      name: string
+      symbol: string
+      decimals: number
+    }
+    rpcUrls: string[]
+    blockExplorerUrls: string[]
+  }
+} = {
+  [ChainId.MAINNET]: {
+    chainId: '0x1',
+    chainName: 'Ethereum',
+    nativeCurrency: {
+      name: 'Ethereum',
+      symbol: 'ETH',
+      decimals: 18,
+    },
+    rpcUrls: ['https://mainnet.infura.io/v3'],
+    blockExplorerUrls: ['https://etherscan.com'],
+  },
+  [ChainId.MATIC]: {
+    chainId: '0x89',
+    chainName: 'Polygon',
+    nativeCurrency: {
+      name: 'Matic',
+      symbol: 'MATIC',
+      decimals: 18,
+    },
+    rpcUrls: ['https://polygon.dmm.exchange/v1/mainnet/geth?appId=prod-dmm'],
+    blockExplorerUrls: ['https://polygonscan.com'],
+  },
+  [ChainId.BSCMAINNET]: {
+    chainId: '0x38',
+    chainName: 'BSC',
+    nativeCurrency: {
+      name: 'BNB',
+      symbol: 'BNB',
+      decimals: 18,
+    },
+    rpcUrls: ['https://bsc.dmm.exchange/v1/mainnet/geth?appId=prod-dmm-interface'],
+    blockExplorerUrls: ['https://bscscan.com'],
+  },
+  [ChainId.AVAXMAINNET]: {
+    chainId: '0xA86A',
+    chainName: 'Avalanche',
+    nativeCurrency: {
+      name: 'AVAX',
+      symbol: 'AVAX',
+      decimals: 18,
+    },
+    rpcUrls: ['https://avalanche.dmm.exchange/v1/mainnet/geth?appId=prod-dmm'],
+    blockExplorerUrls: ['https://snowtrace.io'],
+  },
+  [ChainId.FANTOM]: {
+    chainId: '0xFA',
+    chainName: 'FANTOM',
+    nativeCurrency: {
+      name: 'FTM',
+      symbol: 'FTM',
+      decimals: 18,
+    },
+    rpcUrls: ['https://rpc.ftm.tools'],
+    blockExplorerUrls: ['https://ftmscan.com'],
+  },
+  [ChainId.CRONOS]: {
+    chainId: '0x19',
+    chainName: 'Cronos',
+    nativeCurrency: {
+      name: 'CRO',
+      symbol: 'CRO',
+      decimals: 18,
+    },
+    rpcUrls: ['https://evm-cronos.crypto.org'],
+    blockExplorerUrls: ['https://cronos.crypto.org/explorer'],
+  },
 
-// These networks will be available for users to select. Other networks may be functional
-// (e.g. testnets, or mainnets being prepared for launch) but need to be selected directly via the wallet.
-export const USER_SELECTABLE_NETWORKS = [137];
-
-// Set this to the chain number of the most recently added network in order to enable the 'Now supporting X network'
-// message in the UI. Set to -1 if we don't want to display the message at the current time.
-export const NEWEST_NETWORK_ID = 137;
+  [ChainId.ARBITRUM]: {
+    chainId: '0xa4b1',
+    chainName: 'Arbitrum',
+    nativeCurrency: {
+      name: 'ETH',
+      symbol: 'ETH',
+      decimals: 18,
+    },
+    rpcUrls: ['https://arb1.arbitrum.io/rpc'],
+    blockExplorerUrls: ['https://arbiscan.io'],
+  },
+  [ChainId.BTTC]: {
+    chainId: '0xc7',
+    chainName: 'BitTorrent',
+    nativeCurrency: {
+      name: 'BTT',
+      symbol: 'BTT',
+      decimals: 18,
+    },
+    rpcUrls: ['https://bttc.dev.kyberengineering.io'],
+    blockExplorerUrls: ['https://bttcscan.com'],
+  },
+  [ChainId.VELAS]: {
+    chainId: '0x6a',
+    chainName: 'Velas',
+    nativeCurrency: {
+      name: 'VLX',
+      symbol: 'VLX',
+      decimals: 18,
+    },
+    rpcUrls: ['https://evmexplorer.velas.com/rpc'],
+    blockExplorerUrls: ['https://evmexplorer.velas.com/'],
+  },
+}
+*/
 
 export const NETWORKS: { [key: number]: INetwork } = {
   1: {
@@ -113,10 +216,7 @@ export const NETWORKS: { [key: number]: INetwork } = {
       decimals: 18,
     },
     rpcUrls: [""],
-    blockExplorerUrls: ["https://bscscan.com/#/"],
-    image: ethereum,
-    imageAltText: "Ethereum Logo",
-    uri: () => Reactor.getMainnetURI(),
+    blockExplorerUrls: ["https://etherscan.com/#/"],  
   },
   4: {
     chainName: "Rinkeby Testnet",
@@ -127,10 +227,7 @@ export const NETWORKS: { [key: number]: INetwork } = {
       decimals: 18,
     },
     rpcUrls: [""],
-    blockExplorerUrls: ["https://rinkeby.etherscan.io/#/"],
-    image: ethereum,
-    imageAltText: "Ethereum Logo",
-    uri: () => EnvHelper.alchemyEthereumTestnetURI,
+    blockExplorerUrls: ["https://rinkeby.etherscan.io/#/"], 
   }, 
   43113: {
     chainName: "Avalanche Fuji Testnet",
@@ -140,10 +237,7 @@ export const NETWORKS: { [key: number]: INetwork } = {
       symbol: "AVAX",
     },
     rpcUrls: ["https://api.avax-test.network/ext/bc/C/rpc/"],
-    blockExplorerUrls: ["https://testnet.snowtrace.io/#/"],
-    image: avalanche,
-    imageAltText: "Avalanche Logo",
-    uri: () => EnvHelper.alchemyAvalancheTestnetURI,
+    blockExplorerUrls: ["https://testnet.snowtrace.io/#/"], 
   },
   43114: {
     chainName: "Avalanche",
@@ -153,10 +247,7 @@ export const NETWORKS: { [key: number]: INetwork } = {
       symbol: "AVAX",
     },
     rpcUrls: ["https://api.avax.network/ext/bc/C/rpc/"],
-    blockExplorerUrls: ["https://snowtrace.io/#/"],
-    image: avalanche,
-    imageAltText: "Avalanche Logo",
-    uri: () => Reactor.getMainnetURI(),
+    blockExplorerUrls: ["https://snowtrace.io/#/"], 
   },
   137: {
     chainName: "Polygon",
@@ -166,11 +257,20 @@ export const NETWORKS: { [key: number]: INetwork } = {
       symbol: "MATIC",
     },
     rpcUrls: ["https://polygon-mainnet.infura.io/v3/1030b8cbec174e90a95d512d970c2a0e"],
-    blockExplorerUrls: ["https://polygonscan.com/#/"],
-    image: avalanche,
-    imageAltText: "Polygon Logo",
-    uri: () => Reactor.getMainnetURI(),
+    blockExplorerUrls: ["https://polygonscan.com/#/"], 
   },
+  56: {
+    chainId: 56,
+    chainName: 'BSC',
+    nativeCurrency: {
+      name: 'BSC Mainnet',
+      symbol: 'BNB',
+      decimals: 18,
+    },
+    rpcUrls: ['https://bsc-dataseed.binance.org/'],
+    blockExplorerUrls: ['https://bscscan.com'],
+  },
+  
 };
 
 

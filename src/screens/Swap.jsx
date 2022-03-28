@@ -19,40 +19,42 @@ import { useSelector, useDispatch } from "react-redux";
 import { Settings } from "tabler-icons-react";
 import { useAddress } from "../hooks/web3Context";
 import { ethers } from "ethers";
-import avaxLogo from '../assets/tokens/AVAX.svg'
-import subzLogo from '../assets/tokens/sub.svg'
-import { getTokenPriceInAvax, getTokenPriceInSz } from '../functions/OneInchApi';
+import bnbLogo from '../assets/tokens/bnb.png'
+import ravenLogo from '../assets/tokens/bomb1.png'
+import { getTokenPriceInbnb, getTokenPriceInRaven } from '../functions/OneInchApi';
 import { tokenBalance } from '../functions/Getstatistics';
-import { BASE_TOKEN, NETWORKS, REACT_APP_SUPPORTED_CHAINID } from "../appconfig";
+import { BASE_TOKEN,   REACT_APP_SUPPORTED_CHAINID } from "../appconfig";
 import { useModals } from '@mantine/modals';
 import { useWeb3Context } from "../hooks";
 import { Reactor } from "../reactors/Reactor";
 import BigNumber from "bignumber.js";
 
 import weth from "../abi/weth.json";
-import JoeRouter from "../abi/IJoeRouter02.json";
+import SwapRouterAbi from "../abi/IUniswapV2Router02.json";
 import { ROUTERS } from "../appconfig";
 import ERC20 from "../functions/ERC20";
-import { MaxUint256 } from "@uniswap/sdk-core";
-import {
-    Fetcher as FetcherSpirit,
-    Token as TokenSpirit, WAVAX
-} from "@traderjoe-xyz/sdk";
-import { Fetcher, Route, Token, Trade, TokenAmount, TradeType, Percent } from "@traderjoe-xyz/sdk";
-import { useNotifications } from "@mantine/notifications";
+ import { Token } from "@uniswap/sdk-core";
+ import { useNotifications } from "@mantine/notifications"; 
 
 
-const SUBZERO = new Token(
+
+const RAVEN = new Token(
     REACT_APP_SUPPORTED_CHAINID,
-    '0xC23a0C962C61281F450c282A2EEBbA080Ceeedc7',
+    '0x4154a93ef4dB1e0C3fbb22bda0E36249453E319e',
     18
 );
+
+ const WETH9 = new Token(
+     REACT_APP_SUPPORTED_CHAINID,
+     '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',
+     18
+ )
 
 export default function Swap(props) {
 
 
     const modals = useModals();
-    const { address, connected, connect, chainID } = useWeb3Context();
+    const { address } = useWeb3Context();
 
     const provider = new ethers.providers.Web3Provider(window.ethereum)
     const signer = provider.getSigner();
@@ -61,60 +63,28 @@ export default function Swap(props) {
 
 
 
-    const subzero = "0xC23a0C962C61281F450c282A2EEBbA080Ceeedc7"
-    const [loading, setLoading] = useState(false);
-    const [subzPrice, setSubzPrice] = useState(0);
-    const [useravaxBalance, setUseravaxBalance] = useState(0);
-    const [szBalance, setSzBalance] = useState(0);
+     const [loading, setLoading] = useState(false);
+    const [ravenPrice, setravenPrice] = useState(0);
+    const [userbnbBalance, setUserbnbBalance] = useState(0);
+    const [ravenBalance, setRavenBalance] = useState(0);
     const [payValue, setPayValue] = useState(0)
     const [buyValue, setBuyValue] = useState(0);
 
     const [allowanceIn, setAllowanceIn] = useState(false);
     const [allowanceOut, setAllowanceOut] = useState(false);
     const [swapEnabled, setSwapEnabled] = useState(false);
-
-
-    const isAppLoading = useAppSelector(state => {
-        return state.app && state.app.loading;
-    });
-
-    const baseCurrency = useAppSelector(state => {
-        return state.app && state.app.baseCurrency;
-    });
-
-    const stakingInfo = useAppSelector(state => {
-        return state.app && state.app.stakingInfo;
-    });
-
-
+ 
 
     const swapToken = async (payValue) => {
 
-        const pair = await Fetcher.fetchPairData(SUBZERO, WAVAX[SUBZERO.chainId], provider);
-
-        const route = new Route([pair], WAVAX[SUBZERO.chainId]);
-
-        const amountIn = "1000000000000000000"; // 1 WETH
-
-        const trade = new Trade(
-            route,
-            new TokenAmount(WAVAX[SUBZERO.chainId], amountIn),
-            TradeType.EXACT_INPUT
-        );
-
-
-        const slippageTolerance = new Percent("50", "10000"); // 50 bips, or 0.50%
-
-        const amountOutMin = trade.minimumAmountOut(slippageTolerance).raw; // needs to be converted to e.g. hex
-        const path = [WAVAX[SUBZERO.chainId].address, SUBZERO.address];
-        const to = ""; // should be a checksummed recipient address
-        const deadline = Math.floor(Date.now() / 1000) + 60 * 20; // 20 minutes from the current Unix time
-        const value = trade.inputAmount.raw; // // needs to be converted to e.g. hex
-
+     
+ 
+         const path = [WETH9.address, RAVEN.address];
+   
 
         const router = new ethers.Contract(
             ROUTERS[REACT_APP_SUPPORTED_CHAINID],
-            JoeRouter,
+            SwapRouterAbi.abi,
             signer
         );
 
@@ -123,7 +93,7 @@ export default function Swap(props) {
         console.log('Buying tokens');
         try {
 
-            const buyTx = await router.swapExactAVAXForTokens(
+            const buyTx = await router.swapExactETHForTokens(
                 0,
                 path,
                 address,
@@ -193,15 +163,15 @@ export default function Swap(props) {
 
 
 
-    const tokenValueAvax = async (token, amount) => {
+    const tokenValuebnb = async (token, amount) => {
 
-        const prizeEstimate = await getTokenPriceInAvax(token, ethers.utils.parseUnits(amount));
+        const prizeEstimate = await getTokenPriceInbnb(token, ethers.utils.parseUnits(amount));
         return prizeEstimate;
     }
 
-    const tokenValueSz = async (token, amount) => {
+    const tokenValueRaven = async (token, amount) => {
 
-        const prizeEstimate = await getTokenPriceInSz(token, ethers.utils.parseUnits(amount));
+        const prizeEstimate = await getTokenPriceInRaven(token, ethers.utils.parseUnits(amount));
         return prizeEstimate;
     }
 
@@ -212,9 +182,9 @@ export default function Swap(props) {
     const setSwapparametersPay = (value) => {
         setPayValue(value);
 
-        if (value && value > 0) tokenValueAvax(subzero, value).then((price) => setBuyValue(Number(price).toFixed(4)));
+        if (value && value > 0) tokenValuebnb(RAVEN.address, value).then((price) => setBuyValue(Number(price).toFixed(4)));
         else { setBuyValue(0); setSwapEnabled(false); return; }
-        const buyValuechanged = value * subzPrice;
+        const buyValuechanged = value * ravenPrice;
         console.log(buyValuechanged);
         setSwapEnabled(true); return;
     }
@@ -223,7 +193,7 @@ export default function Swap(props) {
 
         setBuyValue(value);
 
-        if (value && value > 0) tokenValueSz(subzero, value).then((price) => setPayValue(Number(price).toFixed(4)));
+        if (value && value > 0) tokenValueRaven(RAVEN.address, value).then((price) => setPayValue(Number(price).toFixed(4)));
         else { setPayValue(0); setSwapEnabled(false); return; }
         setSwapEnabled(true); return;
 
@@ -233,10 +203,10 @@ export default function Swap(props) {
 
     const ApproveSZ = async () => {
 
-        const SUBZEROCONTRACT = new ERC20(SUBZERO.address, signer, 'SUBZERO', 18);
+        const RAVENCONTRACT = new ERC20(RAVEN.address, signer, 'RAVEN', 18);
 
         try {
-            await SUBZEROCONTRACT.approve(ROUTERS[REACT_APP_SUPPORTED_CHAINID], '100000000000000000000000');
+            await RAVENCONTRACT.approve(ROUTERS[REACT_APP_SUPPORTED_CHAINID], '100000000000000000000000');
         } catch (err) {
 
             console.log(err.message)
@@ -258,13 +228,13 @@ export default function Swap(props) {
 
     const ApproveAwax = async () => {
 
-        const wavax = new ethers.Contract(
-            WAVAX[SUBZERO.chainId].address,
+        const WETH9C = new ethers.Contract(
+            WETH9.address,
             weth,
             signer
         );
         try {
-            await wavax.approve(ROUTERS[REACT_APP_SUPPORTED_CHAINID], '1000000000000000000000');
+            await WETH9C.approve(ROUTERS[REACT_APP_SUPPORTED_CHAINID], '1000000000000000000000');
         } catch (err) {
 
             console.log(err.message)
@@ -284,14 +254,14 @@ export default function Swap(props) {
     }
 
 
-    const isWavaxApproved = async () => {
+    const isWETH9Approved = async () => {
 
-        const wavax = new ethers.Contract(
-            WAVAX[SUBZERO.chainId].address,
+        const WETH9C = new ethers.Contract(
+            WETH9.address,
             weth,
             signer
         );
-        const allowance2 = await wavax.allowance(address, ROUTERS[REACT_APP_SUPPORTED_CHAINID]);
+        const allowance2 = await WETH9C.allowance(address, ROUTERS[REACT_APP_SUPPORTED_CHAINID]);
 
         console.log(allowance2);
 
@@ -306,11 +276,11 @@ export default function Swap(props) {
     }
 
 
-    const isSZApproved = async () => {
+    const isRavenApproved = async () => {
 
-        const SUBZEROCONTRACT = new ERC20(SUBZERO.address, signer, 'SUBZERO', 18);
+        const RAVENCONTRACT = new ERC20(RAVEN.address, signer, 'RAVEN', 18);
 
-        const allowance = await SUBZEROCONTRACT.allowance(address, ROUTERS[REACT_APP_SUPPORTED_CHAINID]);
+        const allowance = await RAVENCONTRACT.allowance(address, ROUTERS[REACT_APP_SUPPORTED_CHAINID]);
         console.log(allowance);
         if (allowance.lte(0)) {
             return false;
@@ -326,24 +296,24 @@ export default function Swap(props) {
         if (address) {
 
 
-            const subzPrice = await getTokenPriceInAvax(subzero, amount);
-            // console.log(subzPrice);
-            setSubzPrice(Number(subzPrice).toFixed(4));
+            const ravenPrice = await getTokenPriceInbnb(RAVEN.address, amount);
+            // console.log(ravenPrice);
+            setravenPrice(Number(ravenPrice).toFixed(4));
 
 
-            const useravaxBalance = await provider.getBalance(address)
-            setUseravaxBalance(Number(ethers.utils.formatEther(useravaxBalance)).toFixed(4));
+            const userbnbBalance = await provider.getBalance(address)
+            setUserbnbBalance(Number(ethers.utils.formatEther(userbnbBalance)).toFixed(4));
 
-            const szBalance = await tokenBalance(provider, address, subzero)
-            setSzBalance(Number(ethers.utils.formatEther(szBalance)).toFixed(4));
+            const rBalance = await tokenBalance(provider, address, RAVEN.address)
+            setRavenBalance(Number(ethers.utils.formatEther(rBalance)).toFixed(4));
 
 
-            const inAllowance = await isWavaxApproved();
+            const inAllowance = await isWETH9Approved();
 
             setAllowanceIn(inAllowance);
 
 
-            const outAllowance = await isSZApproved();
+            const outAllowance = await isRavenApproved();
 
             setAllowanceOut(outAllowance);
 
@@ -372,7 +342,7 @@ export default function Swap(props) {
             >
                 <Group position="center" style={{ marginBottom: 5 }}>
                     <Title order={5} align={"center"} style={{ color: '#969bd5' }}>
-                        Swap Avax for Subzero
+                        Swap BNB for RAVEN
                     </Title>
                 </Group>
 
@@ -384,7 +354,7 @@ export default function Swap(props) {
                                 From</Text>
 
                             <Text style={{ color: '#969bd5', fontSize: "10" }}>
-                                Balance:  {useravaxBalance && useravaxBalance}</Text>
+                                Balance:  {userbnbBalance && userbnbBalance}</Text>
 
                         </Group>
                         <Input
@@ -404,11 +374,11 @@ export default function Swap(props) {
 
                                     <Image
                                         style={{ height: 32, width: 32 }}
-                                        src={avaxLogo}
+                                        src={bnbLogo}
                                         alt="Token image" />
 
                                     <Title order={5} style={{ color: '#969bd5' }}>
-                                        AVAX</Title>
+                                    BNB</Title>
 
                                 </Group>
                             }
@@ -423,7 +393,7 @@ export default function Swap(props) {
                                 To</Text>
 
                             <Text style={{ color: '#969bd5', fontSize: "10" }}>
-                                Balance: {szBalance && szBalance}</Text>
+                                Balance: {ravenBalance && ravenBalance}</Text>
 
                         </Group>
                         <Input
@@ -441,11 +411,11 @@ export default function Swap(props) {
                                 <Group position="right">
                                     <Image
                                         style={{ height: 32, width: 32 }}
-                                        src={subzLogo}
+                                        src={ravenLogo}
                                         alt="Token image"
                                     />
                                     <Title order={5} style={{ color: '#969bd5' }}>
-                                        Subzero</Title>
+                                    RAVEN</Title>
 
                                 </Group>
                             }
@@ -461,10 +431,10 @@ export default function Swap(props) {
                         Price</Text>
 
                     <Text style={{ color: '#969bd5' }}>
-                        {subzPrice && subzPrice} SUBZERO per AVAX</Text>
+                        {ravenPrice && ravenPrice} RAVEN per BNB</Text>
 
                 </Group>
-                {useravaxBalance && useravaxBalance > 0 &&
+                {userbnbBalance && userbnbBalance > 0 &&
                     <Group position="apart">
                         {!allowanceIn ? (
                             <Button
@@ -477,7 +447,7 @@ export default function Swap(props) {
                                     ApproveAwax();
                                 }}
                             >
-                                Approve Avax
+                                Approve BNB
                             </Button>
 
                         ) : (
@@ -485,7 +455,7 @@ export default function Swap(props) {
                                 gradient={{ from: "indigo", to: "violet" }}
                                 style={{ marginTop: 20, width: "47%", color: "gray" }}
                                 size="xs"
-                                radius="md" disabled> Approve Avax</Button>
+                                radius="md" disabled> Approve BNB</Button>
                         )}
                         {!allowanceOut ? (
                             <Button
@@ -521,9 +491,9 @@ export default function Swap(props) {
                     </Group>
                 }
 
-                {useravaxBalance == 0 &&
+                {userbnbBalance === 0 &&
                     <Group position="center" style={{ marginTop: 20 }}>
-                        <Badge size="lg" variant="gradient" gradient={{ from: 'orange', to: 'red' }}>Insufficient Avax Balance</Badge>
+                        <Badge size="lg" variant="gradient" gradient={{ from: 'orange', to: 'red' }}>Insufficient BNB Balance</Badge>
                     </Group>
                 }
 

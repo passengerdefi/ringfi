@@ -62,8 +62,7 @@ const initModal = new Web3Modal({
       package: WalletConnectProvider,
       options: {
         rpc: { 
-          137: NETWORKS[137].uri, 
-          43114: NETWORKS[43114].uri, 
+          56: NETWORKS[137].rpcUrls[0],  
         },
       },
     },

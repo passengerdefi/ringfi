@@ -3,7 +3,7 @@ import { JsonRpcProvider, StaticJsonRpcProvider } from "@ethersproject/providers
 import { error } from "./MessagesSlice";
 import { setAll } from "../reactors";
 import { Reactor } from "../reactors/Reactor";
-import { NETWORKS } from "../appconfig";
+import {   NETWORKS } from "../appconfig";
 import { RootState } from "../store";
 import { EnvHelper } from "../reactors/Environment";
 
@@ -18,13 +18,13 @@ export const initializeNetwork = createAsyncThunk(
       let networkName: string;
       let uri: string;
       let supported: boolean = true;
-      const id: number = await provider.getNetwork().then(network => network.chainId);
+      const id   = await provider.getNetwork().then(network => network.chainId);
 
       const {supportedId,supportednetworkName} = Reactor.getSupportedNetwork();
 
       if( id === supportedId){
         networkName = supportednetworkName;
-        uri = NETWORKS[id].rpcUrls[0];
+        uri = NETWORKS[supportedId].rpcUrls[0];
       } 
       else {
         supported = false;

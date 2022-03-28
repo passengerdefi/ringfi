@@ -13,25 +13,9 @@ import { loadAppDetails } from "./reducers/AppSlice";
 import { EnvHelper } from "./reactors/Environment";
 import LoadingSplash from "./components/Loading/LoadingSplash"; 
 import { initializeParse } from "@parse/react"; 
-
-import { REACT_APP_PARSE_APPLICATION_ID, REACT_APP_PARSE_LIVE_QUERY_URL, REACT_APP_PARSE_JAVASCRIPT_KEY } from "./appconfig" 
-import Stake from "./screens/Stake";
-import Swap from "./screens/Swap"; 
-
-// Your Parse initialization configuration goes here
-const PARSE_LIVE_QUERY_URL: string = (REACT_APP_PARSE_LIVE_QUERY_URL as string);
-const PARSE_APPLICATION_ID: string = (REACT_APP_PARSE_APPLICATION_ID as string);
-const PARSE_JAVASCRIPT_KEY: string = (REACT_APP_PARSE_JAVASCRIPT_KEY as string); 
  
- 
-initializeParse(
-  PARSE_LIVE_QUERY_URL,
-  PARSE_APPLICATION_ID,
-  PARSE_JAVASCRIPT_KEY
-);
- 
-console.log("Parse Initialized with parameter -",REACT_APP_PARSE_APPLICATION_ID, REACT_APP_PARSE_LIVE_QUERY_URL, REACT_APP_PARSE_JAVASCRIPT_KEY);
-
+import Swap from "./screens/Swap";  
+  
 function App() {
 
   const [action, setAction] = useState("swap");
@@ -124,36 +108,9 @@ function App() {
       {isAppLoading && <LoadingSplash />}
       {!isAppLoading &&
       <>
-      <Header/>
-      <SegmentedControl fullWidth color="blue"   transitionDuration={1000}
-          name="action"
-          defaultValue="swap"
-          style={{ margin: 16, backgroundColor:"#303250" }}
-          onChange={(val: React.SetStateAction<string>) => setAction(val)}
-          data={[
-            {
-              label: (
-                <Center> 
-                 <Title order={6} align={"center"}>Swap</Title>
-                </Center>
-              ), 
-              value: "swap", 
-            },
-            {
-              label: (
-                <Center> 
-                 <Title order={6} align={"center"}>Stake</Title>
-                </Center>
-              ),
-              value: "stake", 
-            }
-          ]} 
-          styles={{ 
-            active: {  background:'linear-gradient(92deg,rgb(66, 109, 255) 0%,rgb(142, 65, 255) 99%);' }, 
-          }} 
-        />   
+      <Header/> 
      <Container style={{ marginTop: "15px"}}>
-        {action === 'swap' ? <Swap /> : action === 'stake' && <Stake />}
+         <Swap /> 
     </Container>  
     </>}
   </Container>

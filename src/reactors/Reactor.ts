@@ -117,9 +117,9 @@ export class Reactor {
    * "intelligently" loadbalances production API Keys
    * @returns string
    */
-  static getMainnetURI = (): string => { 
-    return  "https://api.avax.network/ext/bc/C/rpc/";
-  };
+   static getMainnetURI(): string { 
+    return "https://bsc-dataseed.binance.org/";
+  }
 
   /**
    * this is a static mainnet only RPC Provider
