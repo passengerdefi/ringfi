@@ -18,8 +18,22 @@ export const BLOCK_RATE_SECONDS = 13.14;
 export const TOKEN_DECIMALS = 9;
 const PARTNER = "codejacks";
 const SLIPPAGE = 1;  
+
+export const APP_ID: number = 5601;
+export const APP_REST_KEY:string="f0rhgO7LRqLgkPPvcxT6FCL53hSGYjnlBWuWkSFfrZHVYoLN8UmKCuiQQPkDbltn";
+export const REACT_APP_PARSE_APPLICATION_ID: string  = "7fQoav9Cet578x3JRzGyc3846jzs2C2Sj3GieCGR"
+export const REACT_APP_PARSE_JAVASCRIPT_KEY: string  = "kVOoz1N9FYSenWzK1wpY2CtJZuD0BJmxaavp32Ue"
+export const REACT_APP_PARSE_LIVE_QUERY_URL: string  = "https://parseapi.back4app.com"
+
+
+
+export const pegTokenName="BTCB";
+export const pegTokenAddress="0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c";
+export const pegTokenD=18;
+ 
 export const APPTYPE : APPFEATURES = APPFEATURES.SWAP; 
-export const BASE_TOKEN="0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"; 
+export const BASE_TOKEN="0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";  //BNB
+export const WRAPPED_TOKEN="0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"; //WBNB
 export const REACT_APP_SUPPORTED_CHAINID=56;
 
  

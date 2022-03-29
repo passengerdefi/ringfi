@@ -33,22 +33,10 @@ import weth from "../abi/weth.json";
 import SwapRouterAbi from "../abi/IUniswapV2Router02.json";
 import { ROUTERS } from "../appconfig";
 import ERC20 from "../functions/ERC20";
- import { Token } from "@uniswap/sdk-core";
  import { useNotifications } from "@mantine/notifications"; 
+import { WETH9, BOMB } from "../appconfig/tokensConfig";
 
 
-
-const BOMB = new Token(
-    REACT_APP_SUPPORTED_CHAINID,
-    '0x522348779DCb2911539e76A1042aA922F9C47Ee3',
-    18
-);
-
- const WETH9 = new Token(
-     REACT_APP_SUPPORTED_CHAINID,
-     '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',
-     18
- )
 
 export default function Swap(props) {
 
