@@ -345,5 +345,5 @@ export const WBNB = '0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c'
 export const WAVAX = '0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7'
 export const WFTM = '0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83'
 export const WCRO = '0x5c7f8a570d578ed84e63fdfa7b1ee72deae1ae23' 
-export const FWA = '0x9Cf451AB12B55e013AcaE7AC249AabAA2e2B8eaD' 
+export const FWA = '0x9d8E02bF06C33403FaaFB357588AA30A1131E6A8' 
 export { config, chain };
