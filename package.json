@@ -4,7 +4,9 @@
   "private": true,
   "dependencies": {
     "@binance-chain/bsc-connector": "^1.0.0",
+    "@ethersproject/contracts": "^5.6.0",
     "@ethersproject/providers": "^5.6.1",
+    "@kyberswap/aggregator-sdk": "^0.1.21",
     "@ledgerhq/iframe-provider": "^0.4.2",
     "@mantine/core": "^4.0.7",
     "@mantine/dates": "^4.0.6",
@@ -31,6 +33,7 @@
     "axios": "^0.26.1",
     "custom-uniswap-v2-sdk": "^3.2.0",
     "dayjs": "^1.11.0",
+    "elloswap-sdk": "^1.0.22",
     "ethers": "^5.6.1",
     "fs": "^0.0.1-security",
     "https-browserify": "^1.0.0",

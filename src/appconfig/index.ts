@@ -1,11 +1,11 @@
- 
+
 
 export const THE_GRAPH_URL = "https://api.thegraph.com/subgraphs/name/drondin/olympus-graph";
 export const EPOCH_INTERVAL = 2200;
 
 
 
-export enum APPFEATURES{
+export enum APPFEATURES {
   SWAP,
   STAKEANDSWAP,
   DASHBOARD,
@@ -17,26 +17,26 @@ export const BLOCK_RATE_SECONDS = 13.14;
 
 export const TOKEN_DECIMALS = 9;
 const PARTNER = "codejacks";
-const SLIPPAGE = 1;  
+const SLIPPAGE = 1;
 
 export const APP_ID: number = 5601;
-export const APP_REST_KEY:string="f0rhgO7LRqLgkPPvcxT6FCL53hSGYjnlBWuWkSFfrZHVYoLN8UmKCuiQQPkDbltn";
-export const REACT_APP_PARSE_APPLICATION_ID: string  = "7fQoav9Cet578x3JRzGyc3846jzs2C2Sj3GieCGR"
-export const REACT_APP_PARSE_JAVASCRIPT_KEY: string  = "kVOoz1N9FYSenWzK1wpY2CtJZuD0BJmxaavp32Ue"
-export const REACT_APP_PARSE_LIVE_QUERY_URL: string  = "https://parseapi.back4app.com"
+export const APP_REST_KEY: string = "f0rhgO7LRqLgkPPvcxT6FCL53hSGYjnlBWuWkSFfrZHVYoLN8UmKCuiQQPkDbltn";
+export const REACT_APP_PARSE_APPLICATION_ID: string = "7fQoav9Cet578x3JRzGyc3846jzs2C2Sj3GieCGR"
+export const REACT_APP_PARSE_JAVASCRIPT_KEY: string = "kVOoz1N9FYSenWzK1wpY2CtJZuD0BJmxaavp32Ue"
+export const REACT_APP_PARSE_LIVE_QUERY_URL: string = "https://parseapi.back4app.com"
 
 
 
-export const pegTokenName="BTCB";
-export const pegTokenAddress="0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c";
-export const pegTokenD=18;
- 
-export const APPTYPE : APPFEATURES = APPFEATURES.SWAP; 
-export const BASE_TOKEN="0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";  //BNB
-export const WRAPPED_TOKEN="0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"; //WBNB
-export const REACT_APP_SUPPORTED_CHAINID=56;
+export const pegTokenName = "BTCB";
+export const pegTokenAddress = "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c";
+export const pegTokenD = 18;
 
- 
+export const APPTYPE: APPFEATURES = APPFEATURES.SWAP;
+export const BASE_TOKEN = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";  //BNB
+export const WRAPPED_TOKEN = "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"; //WBNB
+export const REACT_APP_SUPPORTED_CHAINID = 56;
+
+
 export enum SupportedChainId {
   BSC = 56,
   MATIC = 137,
@@ -45,8 +45,8 @@ export enum SupportedChainId {
 
 
 export enum NetworkId {
- // MAINNET = 1,
- // TESTNET_RINKEBY = 4, 
+  // MAINNET = 1,
+  // TESTNET_RINKEBY = 4, 
 
   POLYGON = 137,
   POLYGON_TESTNET = 80001,
@@ -59,12 +59,12 @@ export enum NetworkId {
 
   Localhost = 1337,
 }
- 
- 
+
+
 interface IAddresses {
   [key: number]: { [key: string]: string };
 }
- 
+
 /**
  * Network details required to add a network to a user's wallet, as defined in EIP-3085 (https://eips.ethereum.org/EIPS/eip-3085)
  */
@@ -80,8 +80,8 @@ interface INetwork {
   chainId: number;
   nativeCurrency: INativeCurrency;
   rpcUrls: string[];
-  blockExplorerUrls: string[];  
-} 
+  blockExplorerUrls: string[];
+}
 
 export declare enum ChainId {
   MAINNET = 1,
@@ -230,7 +230,7 @@ export const NETWORKS: { [key: number]: INetwork } = {
       decimals: 18,
     },
     rpcUrls: [""],
-    blockExplorerUrls: ["https://etherscan.com/#/"],  
+    blockExplorerUrls: ["https://etherscan.com/#/"],
   },
   4: {
     chainName: "Rinkeby Testnet",
@@ -241,8 +241,8 @@ export const NETWORKS: { [key: number]: INetwork } = {
       decimals: 18,
     },
     rpcUrls: [""],
-    blockExplorerUrls: ["https://rinkeby.etherscan.io/#/"], 
-  }, 
+    blockExplorerUrls: ["https://rinkeby.etherscan.io/#/"],
+  },
   43113: {
     chainName: "Avalanche Fuji Testnet",
     chainId: 43113,
@@ -251,7 +251,7 @@ export const NETWORKS: { [key: number]: INetwork } = {
       symbol: "AVAX",
     },
     rpcUrls: ["https://api.avax-test.network/ext/bc/C/rpc/"],
-    blockExplorerUrls: ["https://testnet.snowtrace.io/#/"], 
+    blockExplorerUrls: ["https://testnet.snowtrace.io/#/"],
   },
   43114: {
     chainName: "Avalanche",
@@ -261,7 +261,7 @@ export const NETWORKS: { [key: number]: INetwork } = {
       symbol: "AVAX",
     },
     rpcUrls: ["https://api.avax.network/ext/bc/C/rpc/"],
-    blockExplorerUrls: ["https://snowtrace.io/#/"], 
+    blockExplorerUrls: ["https://snowtrace.io/#/"],
   },
   137: {
     chainName: "Polygon",
@@ -271,7 +271,7 @@ export const NETWORKS: { [key: number]: INetwork } = {
       symbol: "MATIC",
     },
     rpcUrls: ["https://polygon-mainnet.infura.io/v3/1030b8cbec174e90a95d512d970c2a0e"],
-    blockExplorerUrls: ["https://polygonscan.com/#/"], 
+    blockExplorerUrls: ["https://polygonscan.com/#/"],
   },
   56: {
     chainId: 56,
@@ -284,7 +284,7 @@ export const NETWORKS: { [key: number]: INetwork } = {
     rpcUrls: ['https://bsc-dataseed.binance.org/'],
     blockExplorerUrls: ['https://bscscan.com'],
   },
-  
+
 };
 
 
@@ -316,7 +316,7 @@ const config: Config = {
     "0x0bbca9af0511ad1a1da383135cf3a8d2ac620e549ef9f6ae3a4c33c2fed0af91",
   PUBLIC_URL: process.env.PUBLIC_URL + "/" || "/",
 };
- 
+
 
 const erc = parseInt(process.env.REACT_APP_ERC_CHAIN || "1", 10);
 const bep = parseInt(process.env.REACT_APP_BEP_CHAIN || "56", 10);
@@ -329,8 +329,8 @@ const chain = {
   polygon: isNaN(polygon) ? 137 : polygon,
   avax: isNaN(avax) ? 43114 : avax,
 };
- 
- 
+
+
 
 export const ROUTERS: { [chainId: number]: string } = {
   [SupportedChainId.BSC]: config.PANCAKE_ROUTER,
@@ -339,5 +339,11 @@ export const ROUTERS: { [chainId: number]: string } = {
 };
 
 
-
-export { config,chain };
+export const WETH = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
+export const WMATIC = '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270'
+export const WBNB = '0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c'
+export const WAVAX = '0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7'
+export const WFTM = '0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83'
+export const WCRO = '0x5c7f8a570d578ed84e63fdfa7b1ee72deae1ae23' 
+export const FWA = '0x9Cf451AB12B55e013AcaE7AC249AabAA2e2B8eaD' 
+export { config, chain };

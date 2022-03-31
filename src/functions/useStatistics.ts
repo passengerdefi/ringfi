@@ -13,12 +13,14 @@ import {
 } from "../utils/formatBalance"; 
 import { Fetcher, Route, Token } from "@traderjoe-xyz/sdk";
 import { 
+  APP_ID,
   pegTokenAddress,
   pegTokenD,
   REACT_APP_SUPPORTED_CHAINID,
 } from "../appconfig";
 import ERC20 from "./ERC20";
 import { parseEther, parseUnits } from "ethers/lib/utils";
+import Parse from 'parse';
 
 
 
@@ -105,11 +107,25 @@ export const poolStatistics = async (
     };
 };
  
-  
- 
 
-function getShareStat(TOMB: ethers.Contract, provider: any) {
-  throw new Error("Function not implemented.");
+export const updateBackendForStats = async(apr:string,tvl:string)=> {
+
+
+   const queryAppConfig: Parse.Query = new Parse.Query('PoolConfig');
+  queryAppConfig.equalTo('appId', APP_ID);
+
+  const object: Parse.Object[] = await queryAppConfig.find();
+
+    const json =object[0].toJSON();
+    const PoolConfig: Parse.Object  = object[0];
+    const saveObject :Parse.Object = PoolConfig.clone();
+
+    saveObject.set(json);  
+    saveObject.set('stakingAPY',Number(apr));
+    saveObject.set('stakingTvl',Number(tvl));
+
+    saveObject.save(); 
+  
 }
 
 

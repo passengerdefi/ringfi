@@ -25,7 +25,8 @@ import {
   userAllowance,
   tokenBalance,
   poolStatistics,
-} from "../functions/Getstatistics";
+  updateBackendForStats
+} from "../functions/useStatistics";
 import { ArrowDownCircle } from "tabler-icons-react";
 import { changeApproval, stakeToken,unstakeToken } from "../functions/AppStakerInterface";
 import { isPendingTxn, txnButtonText } from "../reducers/PendingTxnsSlice";
@@ -49,7 +50,7 @@ export default function Stake(props) {
   const [poolId, setPoolId] = useState(1);
 
   const [appId, setAppId] = useState();
-  const [stakingAPY, setStakingAPY] = useState();
+  const [stakingAPY, setStakingAPY] = useState(0);
   const [stakingTvl, setStakingTvl] = useState(1);
   const [stakingTokenName, setStakingTokenName] = useState('');
   const [stakingTokenAddress, setStakingTokenAddress] = useState('');
@@ -67,7 +68,8 @@ export default function Stake(props) {
 
   const [userStakeBalance, setUserStakeBalance] = useState('');
 
-  const [userClaimableBalance, setUserClaimableBalance] = useState(); 
+  const [userClaimableBalance, setUserClaimableBalance] = useState(0.0); 
+  const [userClaimableAmount, setUserClaimableAmount] = useState(0.0); 
  
   const pendingTransactions = useSelector((state) => {
     return state.pendingTransactions;
@@ -192,6 +194,9 @@ export default function Stake(props) {
 
     if (allowance.gt(0)) setApproved(true);
 
+
+  await updateBackendForStats(yearlyAPR,TVL,address);
+ 
     // set Loading ON
     // set Labels.
     // fetch balances from Contracts.
@@ -322,6 +327,7 @@ export default function Stake(props) {
               color={theme.colors.indigo[5]}
             />
           </Group>
+
           <Paper
             shadow="xl"
             radius="md"
@@ -329,7 +335,7 @@ export default function Stake(props) {
             withBorder
             style={{ marginTop: 10, backgroundColor: "#303250", border: 0 }}
           >
-            <Group position="left" style={{ marginBottom: 5 }}>
+             <Group position="left" style={{ marginBottom: 5 }}>
               <Image
                 style={{ height: 40, width: 40 }}
                 src={poolContractLogo}
@@ -343,25 +349,55 @@ export default function Stake(props) {
                 Claimable: {userClaimableBalance} {poolContractName} 
               </Title>
             </Group>
-            <Group position="center">
-              <Button
-                variant="gradient"
-                gradient={{ from: "indigo", to: "violet" }}
-                size="xs"
-                radius="md"
+            <Grid columns={24}>
+              <Grid.Col span={16}>
+                <Input
+                  placeholder="0.0"
+                  variant="filled"
+                  styles={{ input: { width: "100%", boxSizing: "border-box" } }}
+                  style={{ marginBottom: 15 }}
+                  value={userClaimableAmount}
+                  rightSectionWidth={70}
+                  onChange={(event) =>
+                    setUserClaimableAmount(event.currentTarget.value)
+                  }
+                  rightSection={
+                    <Button
+                      variant="default"
+                      gradient={{ from: "indigo", to: "violet" }}
+                      size="xs"
+                      compact
+                      fullWidth
+                      radius="xs"
+                      onClick={() => setUserClaimableAmount(userClaimableBalance)}
+                    >
+                      MAX
+                    </Button>
+                  }
+                />
+              </Grid.Col>
+              <Grid.Col span={8}>
                 
-                  
-                onClick={() => {
-                    onClaimToken(
-                      stakingTokenAddress,
-                      userClaimableBalance,
-                      poolContractAddress
-                    );
-                  }}
-              >
-                Claim Rewards
-              </Button>
-            </Group>
+              <Button
+              variant="gradient"
+              gradient={{ from: "indigo", to: "violet" }}
+              size="xs"
+              radius="md"
+              fullWidth 
+                
+              onClick={() => {
+                  onClaimToken(
+                    stakingTokenAddress,
+                    userClaimableAmount,
+                    poolContractAddress
+                  );
+                }}
+            >
+              Claim Rewards
+            </Button>
+                
+              </Grid.Col>
+            </Grid>
           </Paper>
         </Card>
       </div>
