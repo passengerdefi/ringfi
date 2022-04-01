@@ -1,4 +1,4 @@
-import { chain } from "../appconfig";
+import { REACT_APP_SUPPORTED_CHAINID } from "../appconfig";
 
 export function isMetamask(): boolean {
   return (window as any).ethereum && (window as any).ethereum.isMetaMask;
@@ -17,7 +17,7 @@ export async function addChainBSC() {
     method: "wallet_addEthereumChain",
     params: [
       {
-        chainId: `0x${chain.bep.toString(16)}`,
+        chainId: `0x${REACT_APP_SUPPORTED_CHAINID.toString(16)}`,
         chainName: "Binance Smart Chain Mainnet",
         nativeCurrency: {
           name: "BNB",
@@ -37,7 +37,7 @@ export async function addChainMatic() {
     method: "wallet_addEthereumChain",
     params: [
       {
-        chainId: `0x${chain.polygon.toString(16)}`,
+        chainId: `0x${REACT_APP_SUPPORTED_CHAINID.toString(16)}`,
         chainName: "Polygon POS",
         nativeCurrency: {
           name: "MATIC",
@@ -57,7 +57,7 @@ export async function addChainAvax() {
     method: "wallet_addEthereumChain",
     params: [
       {
-        chainId: `0x${chain.avax.toString(16)}`,
+        chainId: `0x${REACT_APP_SUPPORTED_CHAINID.toString(16)}`,
         chainName: "Avalanche Network",
         nativeCurrency: {
           name: "Avalanche",

@@ -1,11 +1,12 @@
-import { ethers, BigNumber } from "ethers"; 
+import { ethers} from "ethers"; 
   import { clearPendingTxn, fetchPendingTxns } from "../reducers/PendingTxnsSlice";
 import { createAsyncThunk } from "@reduxjs/toolkit"; 
 import { error, info } from "../reducers/MessagesSlice";
 import { IActionValueAsyncThunk, IChangeApprovalAsyncThunk, IJsonRPCError, IStakeAsyncThunk } from "./interfaces"; 
-import { abi as ierc20Abi } from "../abi/IERC20.json";
-import staking from "../abi/rewardpool.json";
+ import deps from "../abi/deployments.mainnet.json";
 import { BNToEther } from "../handlers";
+import { tokenBalance,getSwaps } from '../functions/useStatistics';
+
 
 interface IUAData {
   address: string;
@@ -26,7 +27,7 @@ export const changeApproval = createAsyncThunk(
     const signer = provider.getSigner();
     const tokenContract = new ethers.Contract(
         token,
-        ierc20Abi,
+        deps.tomb.abi,
         signer
     ); 
     let approveTx;
@@ -98,7 +99,7 @@ export const stakeToken = createAsyncThunk(
     const signer = provider.getSigner();
     const poolContract = new ethers.Contract(
         pool,
-        staking.abi,
+        deps.ApexAShareRewardPool.abi,
         signer
     );  
     const value1 = ethers.utils.parseEther(amount.toString());
@@ -117,7 +118,7 @@ export const stakeToken = createAsyncThunk(
         console.log("Approve token ere "+token);
         console.log("Approve pool ere "+pool);
         // won't run if stakeAllowance > 0
-        depositTx = await poolContract.enter(uaData.amount);
+        depositTx = await poolContract.deposit(2,uaData.amount);
       
         console.log("Deposit Tnx recieved ere "+depositTx);
 
@@ -162,8 +163,8 @@ export const unstakeToken = createAsyncThunk(
 
     const signer = provider.getSigner();
     const poolContract = new ethers.Contract(
-        pool,
-        staking.abi,
+      deps.ApexAShareRewardPool.address,
+      deps.ApexAShareRewardPool.abi,
         signer
     );  
     const value1 = ethers.utils.parseEther(amount.toString());
@@ -184,7 +185,7 @@ export const unstakeToken = createAsyncThunk(
         // won't run if stakeAllowance > 0
         if(claimFlag)uaData.amount="0";
 
-        depositTx = await poolContract.leave(uaData.amount);
+        depositTx = await poolContract.withdraw(2,uaData.amount);
       
         console.log("Deposit Tnx recieved ere "+depositTx);
 

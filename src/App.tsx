@@ -3,8 +3,7 @@ import React, { useEffect, useState, useCallback, useRef } from "react";
 import { SegmentedControl } from '@mantine/core';
 import Header from './components/Header/Header'; 
 import { useLocation} from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { shouldTriggerSafetyCheck } from "./handlers"; 
+import { useDispatch } from "react-redux"; 
 import { info } from "./reducers/MessagesSlice"; 
 import { useAddress, useWeb3Context } from "./hooks/web3Context";
 import { initializeNetwork, switchNetwork } from "./reducers/NetworkSlice";
@@ -15,7 +14,7 @@ import LoadingSplash from "./components/Loading/LoadingSplash";
 import { initializeParse } from "@parse/react"; 
 
 import { REACT_APP_PARSE_APPLICATION_ID, REACT_APP_PARSE_LIVE_QUERY_URL, REACT_APP_PARSE_JAVASCRIPT_KEY } from "./appconfig" 
- import Swap from "./screens/Swap"; 
+ import Swap from "./screens/SingleSwap"; 
 import Stake from "./screens/Stake";
 
 // Your Parse initialization configuration goes here

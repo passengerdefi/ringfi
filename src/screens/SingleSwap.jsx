@@ -5,95 +5,83 @@ import {
     Title,
     Group,
     Button,
+    LoadingOverlay, 
     Badge,
     Image,
     Input,
     Grid,
 } from "@mantine/core"; import { useEffect, useState } from "react";
 import { ethers } from "ethers";
-import bnbLogo from '../assets/tokens/bnb.png'
-import bombLogo from '../assets/tokens/bomb1.png'
-import { tokenBalance } from '../functions/useStatistics';
-import { BASE_TOKEN, REACT_APP_SUPPORTED_CHAINID, WRAPPED_TOKEN, FWA } from "../appconfig";
-import { useModals } from '@mantine/modals';
+import srcLogo from '../assets/tokens/fantom.svg'
+import destLogo from '../assets/tokens/apex.png'
+import { tokenBalance,getSwaps } from '../functions/useStatistics';
+import {  REACT_APP_SUPPORTED_CHAINID,  TOKEN, WETH9, PEG,MINSLIPPAGE,SWAPFEES,FEEWALLET } from "../appconfig";
 import { useWeb3Context } from "../hooks";
-
-import weth from "../abi/weth.json";
-import SwapRouterAbi from "../abi/IUniswapV2Router02.json";
-import { ROUTERS } from "../appconfig";
-import ERC20 from "../functions/ERC20";
+import ERC20 from "../types/ERC20";
 import { useNotifications } from "@mantine/notifications";
-import { WETH9, BOMB } from "../appconfig/tokensConfig";
 import { getBestTradeRoute, getData, getRouterAddress } from 'elloswap-sdk'
 import { BigNumber } from 'bignumber.js'
 import { Contract } from '@ethersproject/contracts'
-import DMM_ABI from '@kyberswap/aggregator-sdk/dist/abis/dmm-router-v2.json'
+import DMM_ABI from '../abi/dmm-router-v2.json'
 
+export default function SingleSwap(props) {
 
-
-export default function Swap(props) {
-
-
-    const modals = useModals();
     const { address } = useWeb3Context();
-
+    const { AGGREGATOR_ROUTER } = getRouterAddress();
     const provider = new ethers.providers.Web3Provider(window.ethereum)
+    const [loading, setLoading] = useState(false); 
     const signer = provider.getSigner();
     const notifications = useNotifications();
-
-    const defaultSlippage = 25;
-    const feeAmount = 25;
-
-
-    const [loading, setLoading] = useState(false);
-    const [bombPrice, setbombPrice] = useState(0);
-    const [userbnbBalance, setUserbnbBalance] = useState(0);
-    const [bombBalance, setRavenBalance] = useState(0);
+    const [destPrice, setDestPrice] = useState(0);
+    const [usersrcBalance, setUsersrcBalance] = useState(0);
+    const [destBalance, setDestBalance] = useState(0);
     const [payValue, setPayValue] = useState(0)
     const [buyValue, setBuyValue] = useState(0);
-
     const [allowanceIn, setAllowanceIn] = useState(false);
     const [allowanceOut, setAllowanceOut] = useState(false);
     const [swapEnabled, setSwapEnabled] = useState(false);
-    const [bombPriceCoeff, setBombPriceCoeff] = useState(0);
+    const [destPriceCoeff, setDestPriceCoeff] = useState(0);
     const [minAmountOut, setMinAmountOut] = useState(0);
-
+    const DESTCONTRACT = new ERC20(TOKEN.address, signer, TOKEN.name, TOKEN.decimals);
+    const SRCCONTRACT = new ERC20(WETH9.address, signer, WETH9.name, WETH9.decimals);
+    const amount = new BigNumber("1000000000000000000");
 
     const swapToken = async (payValue) => {
 
 
         const amountInBn = new BigNumber(payValue).times(10 ** WETH9.decimals);
-        const feeInBn = new BigNumber(amountInBn).times(feeAmount).div(10000)
-        const amountInAfterFeeInBn = amountInBn.minus(feeInBn)
-        const swapdata = await getBestTradeRoute(REACT_APP_SUPPORTED_CHAINID, WETH9.address, BOMB.address, amountInAfterFeeInBn.toFixed());
+        const feeInBn = new BigNumber(amountInBn).times(SWAPFEES).div(10000)
+        const amountInAfterFeeInBn = amountInBn.minus(feeInBn) 
+        setLoading(true); 
+        const swapdata = await getSwaps(amountInAfterFeeInBn);
         const outputAmount = swapdata.data.outputAmount
         let newMinAmountOut = new BigNumber(outputAmount)
-        newMinAmountOut = newMinAmountOut.div(1 + +defaultSlippage / 100)
-        setMinAmountOut(newMinAmountOut.integerValue(BigNumber.ROUND_HALF_UP).toFixed())
+        newMinAmountOut = newMinAmountOut.div(1 + +MINSLIPPAGE / 100)
+        await setMinAmountOut(newMinAmountOut.integerValue(BigNumber.ROUND_HALF_UP).toFixed())
+    
+
 
         const data = await getData({
             chainId: REACT_APP_SUPPORTED_CHAINID,
-            currencyInAddress: BASE_TOKEN,
-            currencyInDecimals: WETH9.decimals,
+            currencyInAddress: PEG.address,
+            currencyInDecimals: PEG.decimals,
             amountIn: amountInAfterFeeInBn.toFixed(),
-            currencyOutAddress: BOMB.address,
-            currencyOutDecimals: BOMB.decimals,
+            currencyOutAddress: TOKEN.address,
+            currencyOutDecimals: TOKEN.decimals,
             tradeConfig: {
                 minAmountOut,
                 recipient: address,
                 deadline: Date.now() + 20 * 60 * 1000,
             },
             feeConfig: {
+                isInBps:true,
                 chargeFeeBy: 'currency_in',
-                feeReceiver: FWA,
-                feeAmount:  feeAmount
+                feeReceiver: FEEWALLET,
+                feeAmount:  SWAPFEES
             },
             customTradeRoute: swapdata.swaps,
         });
-
-
-
-        console.log(data);
+ 
 
         if (data.swapV2Parameters) {
             const methodName = data.swapV2Parameters.methodNames.join(',');
@@ -107,157 +95,112 @@ export default function Swap(props) {
                 address && provider ? provider.getSigner(address) : provider
             )
             const signer = provider?.getSigner()
-            if (address && args && signer) {
-                await contract['swap'](...args, ethValue === '0' ? { from: address } : { value: ethValue, from: address })
+            if (address && args && signer && ethValue>0) {
+                
+                
+                try{
+                    await contract[methodName](...args, ethValue === '0' ? { from: address } : { value: ethValue, from: address })
+                } 
+                catch(err) {
+                    console.log(err);
+                    notifications.showNotification({
+                        color: 'red',
+                        title: 'Error.',
+                        message: err.data? err.data.message : err.message,
+                    })
+                } 
+
+                await stats();
             }
         }
 
 
+
     }
-
-
-
-
 
     const setSwapparametersPay = (value) => {
         setPayValue(value);
 
-        if (value && value > 0) setBuyValue(Number(value) * bombPriceCoeff);
+        if (value && value > 0) setBuyValue(Number(value) * destPriceCoeff);
         else { setBuyValue(0); setSwapEnabled(false); return; }
 
         setSwapEnabled(true); return;
     }
-
-
-
-    const ApproveSZ = async () => {
-
-        const BOMBCONTRACT = new ERC20(BOMB.address, signer, 'BOMB', 18);
+    const ApproveDest = async () => {
 
         try {
-            await BOMBCONTRACT.approve(ROUTERS[REACT_APP_SUPPORTED_CHAINID], '100000000000000000000000');
+            await DESTCONTRACT.approve(AGGREGATOR_ROUTER, '100000000000000000000000');
         } catch (err) {
-
-            console.log(err.message)
-
             notifications.showNotification({
                 color: 'red',
                 title: 'Error.',
                 message: err.message,
             })
-
-
             return;
         }
-
         setAllowanceOut(true);
-
 
     }
 
-    const ApproveAwax = async () => {
+    const ApproveSrc = async () => {
 
-        const WETH9C = new ethers.Contract(
-            WETH9.address,
-            weth,
-            signer
-        );
         try {
-            await WETH9C.approve(ROUTERS[REACT_APP_SUPPORTED_CHAINID], '1000000000000000000000');
+            await SRCCONTRACT.approve(AGGREGATOR_ROUTER, '1000000000000000000000');
         } catch (err) {
-
             console.log(err.message)
-
             notifications.showNotification({
                 color: 'red',
                 title: 'Error.',
                 message: err.message,
             })
-
-
             return;
         }
-
         setAllowanceIn(true);
 
     }
 
-
-    const isWETH9Approved = async () => {
-
-        const WETH9C = new ethers.Contract(
-            WETH9.address,
-            weth,
-            signer
-        );
-        const allowance2 = await WETH9C.allowance(address, ROUTERS[REACT_APP_SUPPORTED_CHAINID]);
-
-        console.log(allowance2);
-
-        if (allowance2.lte(0)) {
-
+    const isSRCApproved = async () => {
+        const allowance = await SRCCONTRACT.allowance(address, AGGREGATOR_ROUTER);
+        if (allowance.lte(0)) {
             return false;
-
         }
-
         return true;
-
     }
 
-
-    const isRavenApproved = async () => {
-
-        const BOMBCONTRACT = new ERC20(BOMB.address, signer, 'BOMB', 18);
-
-        const allowance = await BOMBCONTRACT.allowance(address, ROUTERS[REACT_APP_SUPPORTED_CHAINID]);
+    const isDESTApproved = async () => {
+        const allowance = await DESTCONTRACT.allowance(address, AGGREGATOR_ROUTER);
         console.log(allowance);
         if (allowance.lte(0)) {
             return false;
         }
         return true;
-
-
     }
+
+
 
     const stats = async () => {
 
-        const amount = new BigNumber("1000000000000000000");
+       
         if (address) {
-
-
-            const swapParameters = await getBestTradeRoute(REACT_APP_SUPPORTED_CHAINID, WRAPPED_TOKEN, BOMB.address, new BigNumber(amount));
-
+            setLoading(true);
+            const swapParameters = await getSwaps(amount);
             const amountOutUsd = new BigNumber(swapParameters.data.amountOutUsd);
             const outputAmount = new BigNumber(swapParameters.data.outputAmount);
-
             const priceInUsd = amountOutUsd.multipliedBy(amount).dividedBy(outputAmount);
-
-
-            const coeff = amountOutUsd.dividedBy(priceInUsd);  // Bomb per BNB
-
-            setBombPriceCoeff(coeff);
-
-            setbombPrice(priceInUsd.toFixed(4));
+            const coeff = amountOutUsd.dividedBy(priceInUsd);  // USD per TOKEN 
+            setDestPriceCoeff(coeff);
+            setDestPrice(priceInUsd.toFixed(4));
             console.log(priceInUsd.toFixed(4));
-
-            const userbnbBalance = await provider.getBalance(address)
-            setUserbnbBalance(Number(ethers.utils.formatEther(userbnbBalance)).toFixed(4));
-
-            const rBalance = await tokenBalance(provider, address, BOMB.address)
-            setRavenBalance(Number(ethers.utils.formatEther(rBalance)).toFixed(4));
-
-
-            const inAllowance = await isWETH9Approved();
+            const usersrcBalance = await provider.getBalance(address)
+            setUsersrcBalance(Number(ethers.utils.formatEther(usersrcBalance)).toFixed(4));
+            const rBalance = await tokenBalance(provider, address, TOKEN.address)
+            setDestBalance(Number(ethers.utils.formatEther(rBalance)).toFixed(4));
+            const inAllowance = await isSRCApproved();
             setAllowanceIn(inAllowance);
-
-            const outAllowance = await isRavenApproved();
+            const outAllowance = await isDESTApproved();
             setAllowanceOut(outAllowance);
-
-
-
-
-        }
-
+            setLoading(false);
+        } 
 
     }
 
@@ -278,7 +221,7 @@ export default function Swap(props) {
             >
                 <Group position="center" style={{ marginBottom: 5 }}>
                     <Title order={5} align={"center"} style={{ color: '#969bd5' }}>
-                        Swap BNB for BOMB
+                        Swap {PEG.name} for {TOKEN.name}
                     </Title>
                 </Group>
 
@@ -288,11 +231,11 @@ export default function Swap(props) {
                             Slippage Tolerance:{" "}</Text>
 
                         <Text style={{ color: '#969bd5', fontSize: "10" }}>
-                            {defaultSlippage / 50}%</Text>
+                            {MINSLIPPAGE / 50}%</Text>
 
                     </Group>
                 </Box>
-
+                <LoadingOverlay visible={loading}  style={{zIndex:+10}}/>
                 <Grid columns={16} style={{ marginTop: 20 }}>
                     <Grid.Col span={16}>
                         <Group position="apart">
@@ -300,7 +243,7 @@ export default function Swap(props) {
                                 From</Text>
 
                             <Text style={{ color: '#969bd5', fontSize: "10" }}>
-                                Balance:  {userbnbBalance && userbnbBalance}</Text>
+                                Balance:  {usersrcBalance && usersrcBalance}</Text>
 
                         </Group>
                         <Input
@@ -320,11 +263,11 @@ export default function Swap(props) {
 
                                     <Image
                                         style={{ height: 32, width: 32 }}
-                                        src={bnbLogo}
+                                        src={srcLogo}
                                         alt="Token image" />
 
                                     <Title order={5} style={{ color: '#969bd5' }}>
-                                        BNB</Title>
+                                    {PEG.name} </Title>
 
                                 </Group>
                             }
@@ -339,7 +282,7 @@ export default function Swap(props) {
                                 To</Text>
 
                             <Text style={{ color: '#969bd5', fontSize: "10" }}>
-                                Balance: {bombBalance && bombBalance}</Text>
+                                Balance: {destBalance && destBalance}</Text>
 
                         </Group>
                         <Input
@@ -355,11 +298,11 @@ export default function Swap(props) {
                                 <Group position="right">
                                     <Image
                                         style={{ height: 32, width: 32 }}
-                                        src={bombLogo}
+                                        src={destLogo}
                                         alt="Token image"
                                     />
                                     <Title order={5} style={{ color: '#969bd5' }}>
-                                        BOMB
+                                    {TOKEN.name} 
                                     </Title>
 
                                 </Group>
@@ -376,10 +319,10 @@ export default function Swap(props) {
                         Price</Text>
 
                     <Text style={{ color: '#969bd5' }}>
-                        ${bombPrice && bombPrice} / BOMB </Text>
+                        ${destPrice && destPrice} / {TOKEN.name} </Text>
 
                 </Group>
-                {userbnbBalance && userbnbBalance > 0 &&
+                {usersrcBalance && usersrcBalance > 0 &&
                     <Group position="apart">
                         {!allowanceIn ? (
                             <Button
@@ -389,10 +332,10 @@ export default function Swap(props) {
                                 size="xs"
                                 radius="md"
                                 onClick={() => {
-                                    ApproveAwax();
+                                    ApproveSrc();
                                 }}
                             >
-                                Approve BNB
+                                Approve {PEG.name}
                             </Button>
 
                         ) : (
@@ -400,7 +343,7 @@ export default function Swap(props) {
                                 gradient={{ from: "indigo", to: "violet" }}
                                 style={{ marginTop: 20, width: "47%", color: "gray" }}
                                 size="xs"
-                                radius="md" disabled> Approve BNB</Button>
+                                radius="md" disabled> Approve {PEG.name}</Button>
                         )}
                         {!allowanceOut ? (
                             <Button
@@ -410,7 +353,7 @@ export default function Swap(props) {
                                 size="xs"
                                 radius="md"
                                 onClick={() => {
-                                    ApproveSZ();
+                                    ApproveDest();
                                 }}
                             >
                                 Approve Token
@@ -436,13 +379,20 @@ export default function Swap(props) {
                     </Group>
                 }
 
-                {userbnbBalance === 0 &&
+                {usersrcBalance === 0 &&
                     <Group position="center" style={{ marginTop: 20 }}>
-                        <Badge size="lg" variant="gradient" gradient={{ from: 'orange', to: 'red' }}>Insufficient BNB Balance</Badge>
+                        <Badge size="lg" variant="gradient" gradient={{ from: 'orange', to: 'red' }}>Insufficient {PEG.name} Balance</Badge>
                     </Group>
                 }
 
             </Card>
         </Box>
     );
+
+
+
+
+
+
+
 }

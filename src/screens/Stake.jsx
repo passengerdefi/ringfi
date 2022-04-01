@@ -19,8 +19,7 @@ import { useAppSelector,useWeb3Context } from "../hooks";
 import { useSelector, useDispatch } from "react-redux";
 
 import { Settings } from "tabler-icons-react"; 
-import { abi as ierc20Abi } from "../abi/IERC20.json";
-import { ethers } from "ethers";
+ import { ethers } from "ethers";
 import {
   userAllowance,
   tokenBalance,
@@ -31,7 +30,7 @@ import { ArrowDownCircle } from "tabler-icons-react";
 import { changeApproval, stakeToken,unstakeToken } from "../functions/AppStakerInterface";
 import { isPendingTxn, txnButtonText } from "../reducers/PendingTxnsSlice";
 import { useNotifications } from "@mantine/notifications";
-import staking from "../abi/rewardpool.json";
+import  DEPS from "../abi/deployments.mainnet.json";
 import {
   getBalance,
   getDisplayBalance,
@@ -67,6 +66,7 @@ export default function Stake(props) {
   const [depositvalue, setDepositvalue] = useState("");
 
   const [userStakeBalance, setUserStakeBalance] = useState('');
+  const [userUnStakeBalance, setUserUnStakeBalance] = useState('');
 
   const [userClaimableBalance, setUserClaimableBalance] = useState(0.0); 
   const [userClaimableAmount, setUserClaimableAmount] = useState(0.0); 
@@ -130,14 +130,14 @@ export default function Stake(props) {
 
     const tokenContract = new ethers.Contract(
       poolInfo.stakingTokenAddress,
-      ierc20Abi,
+      DEPS.tomb.abi,
       provider
     );
 
 
     const poolContract = new ethers.Contract(
-        staking.address,
-        staking.abi,
+      DEPS.ApexAShareRewardPool.address,
+        DEPS.ApexAShareRewardPool.abi,
         provider
       );
 
@@ -152,7 +152,7 @@ export default function Stake(props) {
       poolInfo.stakingTokenAddress,
       poolInfo.poolContractAddress
     );
-
+ 
     const { dailyAPR, yearlyAPR, TVL } = await poolStatistics(
       provider,
       address,
@@ -160,20 +160,19 @@ export default function Stake(props) {
       poolInfo.stakingTokenName,
       poolInfo.poolContractName,
       poolInfo.poolContractAddress
-    );
+    ); 
 
+     const [a, b] = await poolContract.userInfo(2, address);
 
-    //const [a, b] = await poolContract.userInfo(0, address);
+     const earned = ethers.utils.formatEther(await poolContract.pendingShare(2, address));
 
-
-    const claimableBalance = await poolContract.balanceOf(address);
 
  
-   // const staked = ethers.utils.formatEther(a); 
+     const staked = ethers.utils.formatEther(a); 
 
 
-   // setUserStakeBalance(staked);
-   setUserClaimableBalance(getFullDisplayBalance(claimableBalance));
+     setUserStakeBalance(staked);
+    setUserClaimableBalance(Number(earned).toFixed(4));
 
 
 
@@ -182,7 +181,7 @@ export default function Stake(props) {
 
     setAppId(poolInfo.appId);
     setStakingAPY(yearlyAPR);
-    setStakingTvl(TVL);
+     setStakingTvl(TVL);
     setStakingTokenName(poolInfo.stakingTokenName);
     setStakingTokenAddress(poolInfo.stakingTokenAddress);
     setStakingTokenLogo(poolInfo.stakingTokenLogo);
@@ -195,7 +194,7 @@ export default function Stake(props) {
     if (allowance.gt(0)) setApproved(true);
 
 
-  await updateBackendForStats(yearlyAPR,TVL,address);
+   await updateBackendForStats(yearlyAPR,TVL,address);
  
     // set Loading ON
     // set Labels.
@@ -320,6 +319,61 @@ export default function Stake(props) {
               </Grid.Col>
             </Grid>
           </Paper> 
+          <Paper
+            shadow="xl"
+            radius="md"
+            p="xs"
+            withBorder
+            style={{ marginTop: 10, backgroundColor: "#303250", border: 0 }}
+          >
+            <Title order={6} style={{ marginBottom: 10 ,color:'#969bd5' }}>
+            Staked : {userStakeBalance} {stakingTokenName}
+            </Title>
+            <Grid columns={24}>
+              <Grid.Col span={16}>
+                <Input
+                  placeholder="0.0"
+                  variant="filled"
+                  style={{ marginBottom: 15 }}
+                  value={userUnStakeBalance}
+                  rightSectionWidth={70}
+                  onChange={(event) =>
+                    setUserUnStakeBalance(event.currentTarget.value)
+                  }
+                  rightSection={
+                    <Button
+                      variant="default"
+                      gradient={{ from: "indigo", to: "violet" }}
+                      size="xs"
+                      compact
+                      onClick={() => setUserUnStakeBalance(userStakeBalance)}
+                    >
+                      MAX
+                    </Button>
+                  }
+                />{" "}
+              </Grid.Col>
+              <Grid.Col span={8}>
+                <Button
+                  variant="gradient"
+                  gradient={{ from: "indigo", to: "violet" }}
+                  size="xs"
+                  radius="md"
+                  fullWidth
+                  
+                  onClick={() => {
+                    onUnStakeToken(
+                      stakingTokenAddress,
+                      userUnStakeBalance,
+                      poolContractAddress
+                    );
+                  }}
+                >
+                  Unstake
+                </Button>
+              </Grid.Col>
+            </Grid>
+          </Paper>
           <Group position="center">
             <ArrowDownCircle
               size={60}
@@ -388,7 +442,7 @@ export default function Stake(props) {
               onClick={() => {
                   onClaimToken(
                     stakingTokenAddress,
-                    userClaimableAmount,
+                    0,
                     poolContractAddress
                   );
                 }}
@@ -397,6 +451,24 @@ export default function Stake(props) {
             </Button>
                 
               </Grid.Col>
+
+              <Button
+              variant="gradient"
+              gradient={{ from: "indigo", to: "violet" }}
+              size="xs"
+              radius="md"
+              fullWidth 
+                
+              onClick={() => {
+                  onClaimToken(
+                    stakingTokenAddress,
+                    userClaimableBalance,
+                    poolContractAddress
+                  );
+                }}
+            >
+              Claim & Witthdraw
+            </Button>
             </Grid>
           </Paper>
         </Card>

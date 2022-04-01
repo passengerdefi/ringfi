@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSelector, createSlice } from "@reduxjs/toolkit";
 import { JsonRpcProvider, StaticJsonRpcProvider } from "@ethersproject/providers";
 import { error } from "./MessagesSlice";
-import { setAll } from "../reactors";
+import { setAll } from "../handlers";
 import { Reactor } from "../reactors/Reactor";
 import {   NETWORKS } from "../appconfig";
 import { RootState } from "../store";

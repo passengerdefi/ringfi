@@ -57,3 +57,39 @@ export interface IBaseAddressAsyncThunk extends IBaseAsyncThunk {
 // Account Slice
 
 export interface ICalcUserBondDetailsAsyncThunk extends IBaseAddressAsyncThunk {}
+
+
+export interface SwapParameters {
+  inputAmount:  string;
+  outputAmount: string;
+  totalGas:     number;
+  gasPriceGwei: string;
+  gasUsd:       number;
+  amountInUsd:  number;
+  amountOutUsd: number;
+  receivedUsd:  number;
+  swaps:        Array<Swap[]>;
+  tokens:       { [key: string]: Token };
+}
+
+export interface Swap {
+  pool:              string;
+  tokenIn:           string;
+  tokenOut:          string;
+  swapAmount:        string;
+  amountOut:         string;
+  limitReturnAmount: string;
+  maxPrice:          string;
+  exchange:          string;
+  poolLength:        number;
+  poolType:          string;
+}
+
+export interface Token {
+  address:  string;
+  symbol:   string;
+  name:     string;
+  price:    number;
+  decimals: number;
+}
+

@@ -1,61 +1,27 @@
-
-
-export const THE_GRAPH_URL = "https://api.thegraph.com/subgraphs/name/drondin/olympus-graph";
-export const EPOCH_INTERVAL = 2200;
-
-
-
-export enum APPFEATURES {
-  SWAP,
-  STAKEANDSWAP,
-  DASHBOARD,
-}
-
-
-// NOTE could get this from an outside source since it changes slightly over time
-export const BLOCK_RATE_SECONDS = 13.14;
-
-export const TOKEN_DECIMALS = 9;
-const PARTNER = "codejacks";
-const SLIPPAGE = 1;
-
-export const APP_ID: number = 5601;
+ 
+import { Token } from "@uniswap/sdk-core"; 
+export const APP_ID: number = 2501;
 export const APP_REST_KEY: string = "f0rhgO7LRqLgkPPvcxT6FCL53hSGYjnlBWuWkSFfrZHVYoLN8UmKCuiQQPkDbltn";
 export const REACT_APP_PARSE_APPLICATION_ID: string = "7fQoav9Cet578x3JRzGyc3846jzs2C2Sj3GieCGR"
 export const REACT_APP_PARSE_JAVASCRIPT_KEY: string = "kVOoz1N9FYSenWzK1wpY2CtJZuD0BJmxaavp32Ue"
-export const REACT_APP_PARSE_LIVE_QUERY_URL: string = "https://parseapi.back4app.com"
+export const REACT_APP_PARSE_LIVE_QUERY_URL: string = "https://parseapi.back4app.com" 
+  
+export const REACT_APP_SUPPORTED_CHAINID = 250;
 
-
-
-export const pegTokenName = "BTCB";
-export const pegTokenAddress = "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c";
-export const pegTokenD = 18;
-
-export const APPTYPE: APPFEATURES = APPFEATURES.SWAP;
-export const BASE_TOKEN = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";  //BNB
-export const WRAPPED_TOKEN = "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"; //WBNB
-export const REACT_APP_SUPPORTED_CHAINID = 56;
-
-
-export enum SupportedChainId {
-  BSC = 56,
-  MATIC = 137,
-  AVAX = 43114,
-}
-
+ 
 
 export enum NetworkId {
-  // MAINNET = 1,
+  MAINNET = 1,
   // TESTNET_RINKEBY = 4, 
 
   POLYGON = 137,
-  POLYGON_TESTNET = 80001,
+  //POLYGON_TESTNET = 80001,
 
   FANTOM = 250,
-  FANTOM_TESTNET = 4002,
+ // FANTOM_TESTNET = 4002,
 
   AVALANCHE_FUJI_TESTNET = 43113,
-  AVALANCHE_MAINNET = 43114,
+ // AVALANCHE_MAINNET = 43114,
 
   Localhost = 1337,
 }
@@ -231,28 +197,7 @@ export const NETWORKS: { [key: number]: INetwork } = {
     },
     rpcUrls: [""],
     blockExplorerUrls: ["https://etherscan.com/#/"],
-  },
-  4: {
-    chainName: "Rinkeby Testnet",
-    chainId: 4,
-    nativeCurrency: {
-      name: "Ethereum",
-      symbol: "ETH",
-      decimals: 18,
-    },
-    rpcUrls: [""],
-    blockExplorerUrls: ["https://rinkeby.etherscan.io/#/"],
-  },
-  43113: {
-    chainName: "Avalanche Fuji Testnet",
-    chainId: 43113,
-    nativeCurrency: {
-      name: "Avalanche",
-      symbol: "AVAX",
-    },
-    rpcUrls: ["https://api.avax-test.network/ext/bc/C/rpc/"],
-    blockExplorerUrls: ["https://testnet.snowtrace.io/#/"],
-  },
+  }, 
   43114: {
     chainName: "Avalanche",
     chainId: 43114,
@@ -284,66 +229,57 @@ export const NETWORKS: { [key: number]: INetwork } = {
     rpcUrls: ['https://bsc-dataseed.binance.org/'],
     blockExplorerUrls: ['https://bscscan.com'],
   },
+  
+  250: {
+    chainId: 250,
+    chainName: 'Fantom',
+    nativeCurrency: {
+      name: 'Fantom Mainnet',
+      symbol: 'FTM',
+      decimals: 18,
+    },
+    rpcUrls: ['https://rpc.ftm.tools/'],
+    blockExplorerUrls: ['https://ftmscan.com'],
+  },
 
 };
-
-
-export interface Config {
-  BSC_RPC_URL: string;
-  POLYGON_RPC_URL: string;
-  AVAX_RPC_URL: string;
-  PANCAKE_ROUTER: string;
-  QUICK_SWAP_ROUTER: string;
-  TRADER_JOE_ROUTER: string;
-  PANCAKE_CODE_HASH: string;
-  QUICK_SWAP_CODE_HASH: string;
-  TRADER_JOE_CODE_HASH: string;
-  PUBLIC_URL: string;
-}
-
-const config: Config = {
-  BSC_RPC_URL: process.env.REACT_APP_BSC_RPC_URL as string,
-  POLYGON_RPC_URL: process.env.POLYGON_RPC_URL as string,
-  AVAX_RPC_URL: process.env.REACT_APP_AVAX_RPC_URL as string,
-  PANCAKE_ROUTER: "0x10ED43C718714eb63d5aA57B78B54704E256024E",
-  QUICK_SWAP_ROUTER: "0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff",
-  TRADER_JOE_ROUTER: "0x60aE616a2155Ee3d9A68541Ba4544862310933d4",
-  PANCAKE_CODE_HASH:
-    "0x00fb7f630766e6a796048ea87d01acd3068e8ff67d078148a3fa3f4a84f69bd5",
-  QUICK_SWAP_CODE_HASH:
-    "0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f",
-  TRADER_JOE_CODE_HASH:
-    "0x0bbca9af0511ad1a1da383135cf3a8d2ac620e549ef9f6ae3a4c33c2fed0af91",
-  PUBLIC_URL: process.env.PUBLIC_URL + "/" || "/",
-};
-
-
-const erc = parseInt(process.env.REACT_APP_ERC_CHAIN || "1", 10);
-const bep = parseInt(process.env.REACT_APP_BEP_CHAIN || "56", 10);
-const polygon = parseInt(process.env.REACT_APP_POLYGON_CHAIN || "137", 10);
-const avax = parseInt(process.env.REACT_APP_AVAX_RPC_URL || "43114", 10);
-
-const chain = {
-  erc: isNaN(erc) ? 1 : erc,
-  bep: isNaN(bep) ? 56 : bep,
-  polygon: isNaN(polygon) ? 137 : polygon,
-  avax: isNaN(avax) ? 43114 : avax,
-};
-
-
-
-export const ROUTERS: { [chainId: number]: string } = {
-  [SupportedChainId.BSC]: config.PANCAKE_ROUTER,
-  [SupportedChainId.MATIC]: config.QUICK_SWAP_ROUTER,
-  [SupportedChainId.AVAX]: config.TRADER_JOE_ROUTER,
-};
-
+ 
+ 
 
 export const WETH = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
 export const WMATIC = '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270'
 export const WBNB = '0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c'
 export const WAVAX = '0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7'
 export const WFTM = '0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83'
-export const WCRO = '0x5c7f8a570d578ed84e63fdfa7b1ee72deae1ae23' 
-export const FWA = '0x9d8E02bF06C33403FaaFB357588AA30A1131E6A8' 
-export { config, chain };
+export const WCRO = '0x5c7f8a570d578ed84e63fdfa7b1ee72deae1ae23'  
+
+
+export const TOKEN = new Token(
+  REACT_APP_SUPPORTED_CHAINID,
+  '0x065d934ca7350676c70df4be1c83515d275c11ee',
+  18,
+  'APEX',
+  'APEX'
+);
+export const WETH9 = new Token(
+  REACT_APP_SUPPORTED_CHAINID,
+  '0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83',
+  18,
+  'WFTM',
+  'WFTM'
+);
+
+export const PEG = new Token(
+  REACT_APP_SUPPORTED_CHAINID,
+  '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
+  18,
+  'FTM',
+  'FTM'
+); 
+
+
+export const SWAP_SRC=PEG.address;
+export const SWAP_DEST=TOKEN.address; 
+export const MINSLIPPAGE=25;
+export const SWAPFEES=25;
+export const FEEWALLET='0x9d8E02bF06C33403FaaFB357588AA30A1131E6A8';

@@ -1,0 +1,436 @@
+import {
+    Box,
+    Card,
+    Text,
+    Title,
+    Group,
+    Button,
+    Badge,
+    Image,
+    Input,
+    Grid,
+} from "@mantine/core"; import { useEffect, useState } from "react";
+import { ethers } from "ethers";
+import bnbLogo from '../assets/tokens/bnb.png'
+import bombLogo from '../assets/tokens/bomb1.png'
+import { tokenBalance } from '../functions/useStatistics';
+import { BASE_TOKEN, REACT_APP_SUPPORTED_CHAINID, WRAPPED_TOKEN, FWA } from "../appconfig";
+import { useModals } from '@mantine/modals';
+import { useWeb3Context } from "../hooks";
+
+import weth from "../abi/weth.json"; 
+import ERC20 from "../types/ERC20";
+import { useNotifications } from "@mantine/notifications";
+import { WETH9, BOMB } from "../appconfig/tokensConfig";
+import { getBestTradeRoute, getData, getRouterAddress } from 'elloswap-sdk'
+import { BigNumber } from 'bignumber.js'
+import { Contract } from '@ethersproject/contracts'
+import DMM_ABI from '@kyberswap/aggregator-sdk/dist/abis/dmm-router-v2.json'
+
+
+
+export default function Swap(props) {
+ 
+    const { address } = useWeb3Context(); 
+    const provider = new ethers.providers.Web3Provider(window.ethereum)
+    const signer = provider.getSigner();
+    const notifications = useNotifications(); 
+    const defaultSlippage = 25;
+    const feeAmount = 25; 
+     const [bombPrice, setbombPrice] = useState(0);
+    const [userbnbBalance, setUserbnbBalance] = useState(0);
+    const [bombBalance, setRavenBalance] = useState(0);
+    const [payValue, setPayValue] = useState(0)
+    const [buyValue, setBuyValue] = useState(0); 
+    const [allowanceIn, setAllowanceIn] = useState(false);
+    const [allowanceOut, setAllowanceOut] = useState(false);
+    const [swapEnabled, setSwapEnabled] = useState(false);
+    const [bombPriceCoeff, setBombPriceCoeff] = useState(0);
+    const [minAmountOut, setMinAmountOut] = useState(0);
+
+
+    const swapToken = async (payValue) => {
+
+
+        const amountInBn = new BigNumber(payValue).times(10 ** WETH9.decimals);
+        const feeInBn = new BigNumber(amountInBn).times(feeAmount).div(10000)
+        const amountInAfterFeeInBn = amountInBn.minus(feeInBn)
+        const swapdata = await getBestTradeRoute(REACT_APP_SUPPORTED_CHAINID, WETH9.address, BOMB.address, amountInAfterFeeInBn.toFixed());
+        const outputAmount = swapdata.data.outputAmount
+        let newMinAmountOut = new BigNumber(outputAmount)
+        newMinAmountOut = newMinAmountOut.div(1 + +defaultSlippage / 100)
+        setMinAmountOut(newMinAmountOut.integerValue(BigNumber.ROUND_HALF_UP).toFixed())
+
+        const data = await getData({
+            chainId: REACT_APP_SUPPORTED_CHAINID,
+            currencyInAddress: BASE_TOKEN,
+            currencyInDecimals: WETH9.decimals,
+            amountIn: amountInAfterFeeInBn.toFixed(),
+            currencyOutAddress: BOMB.address,
+            currencyOutDecimals: BOMB.decimals,
+            tradeConfig: {
+                minAmountOut,
+                recipient: address,
+                deadline: Date.now() + 20 * 60 * 1000,
+            },
+            feeConfig: {
+                chargeFeeBy: 'currency_in',
+                feeReceiver: FWA,
+                feeAmount:  feeAmount
+            },
+            customTradeRoute: swapdata.swaps,
+        });
+
+
+
+        console.log(data);
+
+        if (data.swapV2Parameters) {
+            const methodName = data.swapV2Parameters.methodNames.join(',');
+            const ethValue = data.swapV2Parameters.value;
+            const args = data.swapV2Parameters.args;
+
+            const {AGGREGATOR_ROUTER} = await getRouterAddress();
+            const contract = new Contract(
+                AGGREGATOR_ROUTER,
+                DMM_ABI,
+                address && provider ? provider.getSigner(address) : provider
+            )
+            const signer = provider?.getSigner()
+            if (address && args && signer) {
+                await contract['swap'](...args, ethValue === '0' ? { from: address } : { value: ethValue, from: address })
+            }
+        }
+
+
+    }
+
+
+
+
+
+    const setSwapparametersPay = (value) => {
+        setPayValue(value); 
+        if (value && value > 0) setBuyValue(Number(value) * bombPriceCoeff);
+        else { setBuyValue(0); setSwapEnabled(false); return; } 
+        setSwapEnabled(true); return;
+    }
+
+
+
+    const ApproveSZ = async () => {
+
+        const BOMBCONTRACT = new ERC20(BOMB.address, signer, 'BOMB', 18);
+
+        try {
+           // await BOMBCONTRACT.approve(ROUTERS[REACT_APP_SUPPORTED_CHAINID], '100000000000000000000000');
+        } catch (err) {
+
+            console.log(err.message)
+
+            notifications.showNotification({
+                color: 'red',
+                title: 'Error.',
+                message: err.message,
+            })
+
+
+            return;
+        }
+
+        setAllowanceOut(true);
+
+
+    }
+
+    const ApproveAwax = async () => {
+
+        const WETH9C = new ethers.Contract(
+            WETH9.address,
+            weth,
+            signer
+        );
+        try {
+         //   await WETH9C.approve(ROUTERS[REACT_APP_SUPPORTED_CHAINID], '1000000000000000000000');
+        } catch (err) {
+
+            console.log(err.message)
+
+            notifications.showNotification({
+                color: 'red',
+                title: 'Error.',
+                message: err.message,
+            })
+
+
+            return;
+        }
+
+        setAllowanceIn(true);
+
+    }
+
+
+    const isWETH9Approved = async () => {
+
+        const WETH9C = new ethers.Contract(
+            WETH9.address,
+            weth,
+            signer
+        );
+       // const allowance2 = await WETH9C.allowance(address, ROUTERS[REACT_APP_SUPPORTED_CHAINID]);
+
+       // console.log(allowance2);
+
+       // if (allowance2.lte(0)) {
+
+            return false;
+
+       // }
+
+       // return true;
+
+    }
+
+
+    const isRavenApproved = async () => {
+
+        const BOMBCONTRACT = new ERC20(BOMB.address, signer, 'BOMB', 18);
+
+      //  const allowance = await BOMBCONTRACT.allowance(address, ROUTERS[REACT_APP_SUPPORTED_CHAINID]);
+     //   console.log(allowance);
+     //   if (allowance.lte(0)) {
+            return false;
+       // }
+     //   return true;
+
+
+    }
+
+    const stats = async () => {
+
+        const amount = new BigNumber("1000000000000000000");
+        if (address) {
+
+
+            const swapParameters = await getBestTradeRoute(REACT_APP_SUPPORTED_CHAINID, WRAPPED_TOKEN, BOMB.address, new BigNumber(amount));
+
+            const amountOutUsd = new BigNumber(swapParameters.data.amountOutUsd);
+            const outputAmount = new BigNumber(swapParameters.data.outputAmount);
+
+            const priceInUsd = amountOutUsd.multipliedBy(amount).dividedBy(outputAmount);
+
+
+            const coeff = amountOutUsd.dividedBy(priceInUsd);  // Bomb per BNB
+
+            setBombPriceCoeff(coeff);
+
+            setbombPrice(priceInUsd.toFixed(4));
+            console.log(priceInUsd.toFixed(4));
+
+            const userbnbBalance = await provider.getBalance(address)
+            setUserbnbBalance(Number(ethers.utils.formatEther(userbnbBalance)).toFixed(4));
+
+            const rBalance = await tokenBalance(provider, address, BOMB.address)
+            setRavenBalance(Number(ethers.utils.formatEther(rBalance)).toFixed(4));
+
+
+            const inAllowance = await isWETH9Approved();
+            setAllowanceIn(inAllowance);
+
+            const outAllowance = await isRavenApproved();
+            setAllowanceOut(outAllowance);
+
+
+
+
+        }
+
+
+    }
+
+    useEffect(() => {
+        if (address) {
+
+            stats();
+        }
+
+    }, [address]);
+
+    return (
+        <Box>
+            <Card
+                shadow="lg"
+                radius="md"
+                style={{ marginTop: 10, backgroundColor: "#303250" }}
+            >
+                <Group position="center" style={{ marginBottom: 5 }}>
+                    <Title order={5} align={"center"} style={{ color: '#969bd5' }}>
+                        Swap BNB for BOMB
+                    </Title>
+                </Group>
+
+                <Box display="flex">
+                    <Group position="apart">
+                        <Text style={{ color: '#969bd5', fontSize: "10" }}>
+                            Slippage Tolerance:{" "}</Text>
+
+                        <Text style={{ color: '#969bd5', fontSize: "10" }}>
+                            {defaultSlippage / 50}%</Text>
+
+                    </Group>
+                </Box>
+
+                <Grid columns={16} style={{ marginTop: 20 }}>
+                    <Grid.Col span={16}>
+                        <Group position="apart">
+                            <Text style={{ color: '#969bd5', fontSize: "10" }}>
+                                From</Text>
+
+                            <Text style={{ color: '#969bd5', fontSize: "10" }}>
+                                Balance:  {userbnbBalance && userbnbBalance}</Text>
+
+                        </Group>
+                        <Input
+                            placeholder="0.0"
+                            variant="filled"
+                            size="lg"
+                            styles={{ input: { width: "100%", boxSizing: "border-box" } }}
+                            style={{ marginBottom: 15 }}
+                            value={payValue}
+                            onChange={(event) =>
+                                setSwapparametersPay(event.currentTarget.value)
+                            }
+
+                            rightSectionWidth={120}
+                            rightSection={
+                                <Group position="right">
+
+                                    <Image
+                                        style={{ height: 32, width: 32 }}
+                                        src={bnbLogo}
+                                        alt="Token image" />
+
+                                    <Title order={5} style={{ color: '#969bd5' }}>
+                                        BNB</Title>
+
+                                </Group>
+                            }
+
+                        />
+                    </Grid.Col>
+                </Grid>
+                <Grid columns={16}>
+                    <Grid.Col span={16}>
+                        <Group position="apart">
+                            <Text style={{ color: '#969bd5', fontSize: "10" }}>
+                                To</Text>
+
+                            <Text style={{ color: '#969bd5', fontSize: "10" }}>
+                                Balance: {bombBalance && bombBalance}</Text>
+
+                        </Group>
+                        <Input
+                            placeholder="0.0"
+                            variant="filled"
+                            size="lg"
+                            styles={{ input: { width: "100%", boxSizing: "border-box" } }}
+                            style={{ marginBottom: 15 }}
+                            value={buyValue}
+                            rightSectionWidth={120}
+                            disabled
+                            rightSection={
+                                <Group position="right">
+                                    <Image
+                                        style={{ height: 32, width: 32 }}
+                                        src={bombLogo}
+                                        alt="Token image"
+                                    />
+                                    <Title order={5} style={{ color: '#969bd5' }}>
+                                        BOMB
+                                    </Title>
+
+                                </Group>
+                            }
+
+                        />
+                    </Grid.Col>
+
+                </Grid>
+
+
+                <Group position="apart" style={{ marginTop: 20 }}>
+                    <Text style={{ color: '#969bd5' }}>
+                        Price</Text>
+
+                    <Text style={{ color: '#969bd5' }}>
+                        ${bombPrice && bombPrice} / BOMB </Text>
+
+                </Group>
+                {userbnbBalance && userbnbBalance > 0 &&
+                    <Group position="apart">
+                        {!allowanceIn ? (
+                            <Button
+                                variant="gradient"
+                                gradient={{ from: "indigo", to: "violet" }}
+                                style={{ marginTop: 20, width: "47%" }}
+                                size="xs"
+                                radius="md"
+                                onClick={() => {
+                                    ApproveAwax();
+                                }}
+                            >
+                                Approve BNB
+                            </Button>
+
+                        ) : (
+                            <Button variant="gradient"
+                                gradient={{ from: "indigo", to: "violet" }}
+                                style={{ marginTop: 20, width: "47%", color: "gray" }}
+                                size="xs"
+                                radius="md" disabled> Approve BNB</Button>
+                        )}
+                        {!allowanceOut ? (
+                            <Button
+                                variant="gradient"
+                                gradient={{ from: "indigo", to: "violet" }}
+                                style={{ marginTop: 20, width: "47%" }}
+                                size="xs"
+                                radius="md"
+                                onClick={() => {
+                                    ApproveSZ();
+                                }}
+                            >
+                                Approve Token
+                            </Button>
+
+                        ) : (
+                            <Button
+                                variant="gradient"
+                                gradient={{ from: "indigo", to: "violet" }}
+                                style={{ marginTop: 20, width: "47%", color: !swapEnabled ? 'gray' : 'white' }}
+                                size="xs"
+                                disabled={!swapEnabled}
+                                radius="md"
+                                onClick={() => {
+                                    swapToken(payValue);
+                                }}
+                            >
+                                Swap
+                            </Button>
+                        )}
+
+
+                    </Group>
+                }
+
+                {userbnbBalance === 0 &&
+                    <Group position="center" style={{ marginTop: 20 }}>
+                        <Badge size="lg" variant="gradient" gradient={{ from: 'orange', to: 'red' }}>Insufficient BNB Balance</Badge>
+                    </Group>
+                }
+
+            </Card>
+        </Box>
+    );
+}

@@ -1,9 +1,8 @@
 import { useAddress, useWeb3Context } from "../hooks/web3Context";
-import { abi as ierc20Abi } from "../abi/IERC20.json";
-import staking from "../abi/rewardpool.json"; 
-import { BigNumber, ethers } from "ethers"; 
-import contracts from "../abi/tomb_deployments.json";
-import { WETH9, BOMB } from "../appconfig/tokensConfig";
+  import { BigNumber, ethers } from "ethers"; 
+import contracts from "../abi/deployments.mainnet.json";
+import { BigNumber as bn} from 'bignumber.js'
+import  DEPS from "../abi/deployments.mainnet.json";
 
 
 import {
@@ -11,16 +10,30 @@ import {
   getDisplayBalance,
   getFullDisplayBalance,
 } from "../utils/formatBalance"; 
-import { Fetcher, Route, Token } from "@traderjoe-xyz/sdk";
-import { 
-  APP_ID,
-  pegTokenAddress,
-  pegTokenD,
-  REACT_APP_SUPPORTED_CHAINID,
-} from "../appconfig";
-import ERC20 from "./ERC20";
+import {  REACT_APP_SUPPORTED_CHAINID,  TOKEN, WETH9,APP_ID } from "../appconfig";
+
+import ERC20 from "../types/ERC20";
 import { parseEther, parseUnits } from "ethers/lib/utils";
 import Parse from 'parse';
+import { getBestTradeRoute } from "elloswap-sdk";
+import { SwapParameters } from "./interfaces";
+
+
+export const getSwaps =async(payValue: any)=>{
+       
+  const swapParameters = await getBestTradeRoute(REACT_APP_SUPPORTED_CHAINID, WETH9.address, TOKEN.address, new bn(payValue) );
+
+  return swapParameters;
+}
+
+
+export const getSwapPrice =async(earnTokenAdd: string,payValue: any)=>{
+       
+  const swapParameters = await getBestTradeRoute(REACT_APP_SUPPORTED_CHAINID, WETH9.address, earnTokenAdd, new bn(payValue) );
+
+  return swapParameters;
+}
+
 
 
 
@@ -42,7 +55,7 @@ export const tokenBalance = async (
 ) => {
   const tokenContract = new ethers.Contract(
     stakingTokenAddress,
-    ierc20Abi,
+    contracts.tomb.abi,
     provider
   );
   const userBalance = await tokenContract.balanceOf(address);
@@ -59,7 +72,7 @@ export const userAllowance = async (
 ) => {
   const tokenContract = new ethers.Contract(
     stakingTokenAddress,
-    ierc20Abi,
+    contracts.tomb.abi,
     provider
   );
   const userAllowance = await tokenContract.allowance(
@@ -69,6 +82,20 @@ export const userAllowance = async (
   return userAllowance;
 };
 
+
+export const  getShareStat = async( signer: any, earnTokenName: string,) => {
+ 
+  const priceInFTMZ : SwapParameters | any= await getSwapPrice(DEPS.tShare.address,new bn('1000000000000000'));
+ 
+  const priceOfSharesInDollars = priceInFTMZ.data.tokens[DEPS.tShare.address].price; 
+ 
+
+  return { 
+    priceInDollars: priceOfSharesInDollars, 
+  };
+}
+
+
 export const poolStatistics = async (
   provider: any,
   address: any,
@@ -76,29 +103,34 @@ export const poolStatistics = async (
   depositTokenName: string,
   earnTokenName: string,
   poolContractAddress: any
-) => {
-  const bombToken = new ethers.Contract(stakingTokenAddress, ierc20Abi, provider);
-  const xbombToken = new ethers.Contract(poolContractAddress, staking.abi, provider);
- 
+) => { 
 
-  const xbombExchange = await getXbombExchange(xbombToken);
-  const xbombPercent = await xbombExchange;
-  const xbombPercentTotal = (Number(xbombPercent) / 1000000000000000000) * 100 - 100;
+  const signer = provider.getSigner();
+  const poolContract = new ethers.Contract(
+    poolContractAddress,
+      DEPS.ApexAShareRewardPool.abi,
+      provider
+    );
 
-  const depositTokenPrice = await getDepositTokenPriceInDollars(bombToken.symbol, bombToken);
+    const depositToken = new ERC20(stakingTokenAddress, signer, depositTokenName, TOKEN.decimals);
 
-  const stakeInPool = await bombToken.balanceOf(xbombToken.address);
+    const tokensPrice : SwapParameters | any= await getSwaps(new bn('1000000000000000'));
+    const depositTokenPrice = tokensPrice.data.tokens[stakingTokenAddress].price;
+    const stakeInPool = await depositToken.balanceOf(poolContractAddress);
+      const TVL = Number(depositTokenPrice) * Number(getDisplayBalance(stakeInPool, depositToken.decimal));
+      const stat =  await getShareStat(signer,earnTokenName);
+      let tokenPerSecond = await poolContract.AsharePerSecond();
+      tokenPerSecond= tokenPerSecond.mul(450).div(1000);
+      const tokenPerHour = tokenPerSecond.mul(60).mul(60);
+      const totalRewardPricePerYear =
+        Number(stat.priceInDollars) * Number(getDisplayBalance(tokenPerHour.mul(24).mul(365)));
+      const totalRewardPricePerDay = Number(stat.priceInDollars) * Number(getDisplayBalance(tokenPerHour.mul(24)));
+      const totalStakingTokenInPool =
+        Number(depositTokenPrice) * Number(getDisplayBalance(stakeInPool, depositToken.decimal));
+      const dailyAPR = (totalRewardPricePerDay / totalStakingTokenInPool) * 100;
+      const yearlyAPR = (totalRewardPricePerYear / totalStakingTokenInPool) * 100;
 
-  const TVL = Number(depositTokenPrice) * Number(getDisplayBalance(stakeInPool, bombToken.decimal));
-  const startDate = new Date('January 24, 2022');
-  const nowDate = new Date(Date.now());
-  const difference = nowDate.getTime() - startDate.getTime();
-  const days = difference / 60 / 60 / 24 / 1000;
-  const aprPerDay = xbombPercentTotal / days;
 
-
-  const dailyAPR = aprPerDay;
-    const yearlyAPR = aprPerDay * 365;
 
     return {
       dailyAPR: dailyAPR.toFixed(2).toString(),
