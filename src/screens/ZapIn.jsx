@@ -24,7 +24,7 @@ import { zapInToken } from "../functions/ZapInterface";
 import { isPendingTxn, txnButtonText } from "../reducers/PendingTxnsSlice";
 import { useNotifications } from "@mantine/notifications";
 import { bscPools } from "../appconfig/bsc_pools";
-import { beefyUniV2ZapABI, erc20ABI } from '../appconfig/abi';
+import { beefyUniV2ZapABI, erc20ABI, bnbVaultABI } from '../appconfig/abi';
 import { addressBook } from 'bombfarm-addressbook';
 import { bscZaps } from "../appconfig/bsc_zaps";
 import { MINSLIPPAGE } from "../appconfig";
@@ -59,9 +59,17 @@ export default function ZapIn() {
 
     const [balanceDisplay,setBalanceDisplay]=useState("");
     const [selectedTokenName,setSelectedTokenName]=useState("");
+     const [balanceInVault,setBalanceInVault]=useState("");
+     const [poolName,setPoolName]=useState("");
+
 
 
     const zapContract = new ethers.Contract(bscZaps.zapAddress,beefyUniV2ZapABI,signer);
+    const LPPool = new ethers.Contract(bscPools[0].tokenAddress,erc20ABI,signer);
+    const BOMB = new ethers.Contract(bscAddressBook.tokens.BOMB.address,erc20ABI,signer);
+    const BTCB = new ethers.Contract(bscAddressBook.tokens.BTCB.address,erc20ABI,signer); 
+
+    const POOL = new ethers.Contract(bscPools[0].earnContractAddress,bnbVaultABI,signer); 
 
     const pendingTransactions = useSelector((state) => {
         return state.pendingTransactions;
@@ -166,10 +174,6 @@ export default function ZapIn() {
 
     const initZapScreen = async () => { 
 
-        const LPPool = new ethers.Contract(bscPools[0].tokenAddress,erc20ABI,signer);
-        const BOMB = new ethers.Contract(bscAddressBook.tokens.BOMB.address,erc20ABI,signer);
-        const BTCB = new ethers.Contract(bscAddressBook.tokens.BTCB.address,erc20ABI,signer); 
- 
         const usersLPBalance = await LPPool.balanceOf(address);
         const usersBombBalance = await BOMB.balanceOf(address);
         const usersBTCBBalance = await BTCB.balanceOf(address); 
@@ -182,7 +186,22 @@ export default function ZapIn() {
 
 
 
+        const tempbalanceInZap =  await POOL.balanceOf(address);
+        const temppricePerShare =  await POOL.getPricePerFullShare();
 
+        console.log(Number(ethers.utils.formatEther(tempbalanceInZap)).toFixed(4));
+        console.log(Number(ethers.utils.formatEther(temppricePerShare)).toFixed(4));
+
+
+        const balanceInZap =  Number(ethers.utils.formatEther(tempbalanceInZap)).toFixed(18);
+        const pricePerShare = Number(ethers.utils.formatEther(temppricePerShare)).toFixed(18);
+
+        setPoolName(await POOL.name());
+
+        const balanceInVault = Number(balanceInZap*pricePerShare).toFixed(5);;
+
+        setBalanceInVault(balanceInVault);
+ 
         setLpAllowance(lpAllowance);
         setBombAllowance(bombAllowance);
         setBtcbAllowance(btcbAllowance);
@@ -312,6 +331,12 @@ export default function ZapIn() {
                                 )}{" "}
                             </Grid.Col>
                         </Grid>
+
+                        <Title order={6} style={{ marginBottom: 10, color: '#969bd5' }}>
+                            Zap Balance : {balanceInVault} {poolName}
+                        </Title>
+
+
                     </Paper>
                     
                 </Card>
