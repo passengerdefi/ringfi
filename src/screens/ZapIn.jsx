@@ -2,45 +2,27 @@ import { useEffect, useState } from "react";
 import {
     Box,
     Card,
-    Text,
-    useMantineTheme,
     Title,
     Group,
     Button,
     InputWrapper,
-    Image,
     LoadingOverlay,
     Input,
     Paper,
     Select,
     Grid,
 } from "@mantine/core";
-import { useAppSelector, useWeb3Context } from "../hooks";
+import { useWeb3Context } from "../hooks";
 import { useSelector, useDispatch } from "react-redux";
 import { ChevronDown } from 'tabler-icons-react';
 
-import { Settings } from "tabler-icons-react";
-import { abi as ierc20Abi } from "../abi/ERC20.json";
 import { ethers } from "ethers";
-import {
-    userAllowance,
-    tokenBalance,
-    poolStatistics,
-    updateBackendForStats
-} from "../functions/useStatistics";
 import { inputTokens } from '../appconfig/bombconfig'
-import { ArrowDownCircle } from "tabler-icons-react";
 import { changeApproval } from "../functions/AppStakerInterface";
 import { zapInToken } from "../functions/ZapInterface";
 
 import { isPendingTxn, txnButtonText } from "../reducers/PendingTxnsSlice";
 import { useNotifications } from "@mantine/notifications";
-import staking from "../abi/deployments.mainnet.json";
-import {
-    getBalance,
-    getDisplayBalance,
-    getFullDisplayBalance,
-} from "../utils/formatBalance";
 import { bscPools } from "../appconfig/bsc_pools";
 import { beefyUniV2ZapABI, erc20ABI } from '../appconfig/abi';
 import { addressBook } from 'bombfarm-addressbook';

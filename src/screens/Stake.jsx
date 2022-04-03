@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import {
   Box,
   Card,
-  Text,
   useMantineTheme,
   Title,
   Group,
@@ -12,13 +11,11 @@ import {
   LoadingOverlay,
   Input,
   Paper,
-  ActionIcon,
   Grid,
 } from "@mantine/core";
 import { useAppSelector,useWeb3Context } from "../hooks";
 import { useSelector, useDispatch } from "react-redux";
 
-import { Settings } from "tabler-icons-react"; 
 import { abi as ierc20Abi } from "../abi/ERC20.json";
 import { ethers } from "ethers";
 import {
@@ -33,8 +30,6 @@ import { isPendingTxn, txnButtonText } from "../reducers/PendingTxnsSlice";
 import { useNotifications } from "@mantine/notifications";
 import staking from "../abi/deployments.mainnet.json";
 import {
-  getBalance,
-  getDisplayBalance,
   getFullDisplayBalance,
 } from "../utils/formatBalance";
 

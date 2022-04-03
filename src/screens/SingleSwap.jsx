@@ -19,7 +19,7 @@ import {  REACT_APP_SUPPORTED_CHAINID,  TOKEN, WETH9, PEG,MINSLIPPAGE,SWAPFEES,F
 import { useWeb3Context } from "../hooks";
 import ERC20 from "../types/ERC20";
 import { useNotifications } from "@mantine/notifications";
-import { getBestTradeRoute, getData, getRouterAddress } from 'elloswap-sdk'
+import { getData, getRouterAddress } from 'elloswap-sdk'
 import { BigNumber } from 'bignumber.js'
 import { Contract } from '@ethersproject/contracts'
 import DMM_ABI from '../abi/dmm-router-v2.json'
