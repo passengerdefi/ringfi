@@ -1,5 +1,6 @@
 import { JsonRpcProvider, StaticJsonRpcProvider } from "@ethersproject/providers";
 import { NotificationsContextProps } from "@mantine/notifications/lib/types";
+import { BigNumber } from "ethers";
 
 export enum NetworkID {
   Mainnet = 56,
@@ -33,6 +34,17 @@ export interface IStakeAsyncThunk extends IBaseAsyncThunk {
   readonly claimFlag:boolean;
   readonly notifications: NotificationsContextProps;
 }
+
+export interface IZapAsyncThunk extends IBaseAsyncThunk {
+  readonly vaultAddress: string;
+  readonly swapAmountOutMin: number;
+  readonly token: string;
+  readonly zapvalue: BigNumber;
+  readonly address: string;
+  readonly claimFlag:boolean;
+  readonly notifications: NotificationsContextProps;
+}
+
 
 export interface IActionAsyncThunk extends IBaseAsyncThunk {
   readonly action: string;

@@ -8,7 +8,7 @@ class ERC20 {
   private contract: Contract;
 
   address: string;
-  symbol: string;
+  symbol: string ;
   decimal: number;
 
   constructor(address: string, provider: Signer | Provider, symbol: string, decimal = 18) {

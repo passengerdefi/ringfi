@@ -3872,6 +3872,11 @@ body-parser@1.19.2, body-parser@^1.16.0:
     raw-body "2.4.3"
     type-is "~1.6.18"
 
+bombfarm-addressbook@^0.5.10:
+  version "0.5.10"
+  resolved "https://registry.yarnpkg.com/bombfarm-addressbook/-/bombfarm-addressbook-0.5.10.tgz#31989dce87a260356da6acae99f81e494a6ff643"
+  integrity sha512-x1VK8nriPnW22xQRPApEX5RMHCXIVj6j7gY8V5ePqyJAsU3MNJk1yNa50CHucscQbyeLxXM/NDAGr3Z/zlAtyQ==
+
 bonjour@^3.5.0:
   version "3.5.0"
   resolved "https://registry.yarnpkg.com/bonjour/-/bonjour-3.5.0.tgz#8e890a183d8ee9a2393b3844c691a42bcf7bc9f5"

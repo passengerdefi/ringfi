@@ -16,6 +16,7 @@ import { initializeParse } from "@parse/react";
 import { REACT_APP_PARSE_APPLICATION_ID, REACT_APP_PARSE_LIVE_QUERY_URL, REACT_APP_PARSE_JAVASCRIPT_KEY } from "./appconfig" 
  import Swap from "./screens/SingleSwap"; 
 import Stake from "./screens/Stake";
+import ZapIn from "./screens/ZapIn";
 
 // Your Parse initialization configuration goes here
 const PARSE_LIVE_QUERY_URL: string = (REACT_APP_PARSE_LIVE_QUERY_URL as string);
@@ -149,6 +150,14 @@ function App() {
                 </Center>
               ),
               value: "stake", 
+            },
+            {
+              label: (
+                <Center> 
+                 <Title order={6} align={"center"}>Zap</Title>
+                </Center>
+              ),
+              value: "zap", 
             }
           ]} 
           styles={{ 
@@ -156,7 +165,7 @@ function App() {
           }} 
         />   
      <Container style={{ marginTop: "15px"}}>
-        {action === 'swap' ? <Swap /> : action === 'stake' && <Stake />}
+        {action === 'swap' ? <Swap /> : action === 'stake' ? <Stake />: <ZapIn/>}
     </Container>  
     </>}
   </Container>

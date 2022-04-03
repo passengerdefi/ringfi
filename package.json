@@ -1,5 +1,5 @@
 {
-  "name": "passenger_apex",
+  "name": "passenger_bomb",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -25,6 +25,7 @@
     "@web3-react/injected-connector": "^6.0.7",
     "assert": "^2.0.0",
     "axios": "^0.26.1",
+    "bombfarm-addressbook": "^0.5.10",
     "dayjs": "^1.11.0",
     "elloswap-sdk": "^1.0.22",
     "ethers": "^5.6.1",
