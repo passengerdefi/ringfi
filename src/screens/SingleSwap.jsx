@@ -13,7 +13,7 @@ import {
 } from "@mantine/core"; import { useEffect, useState } from "react";
 import { ethers } from "ethers";
 import srcLogo from '../assets/tokens/bnb.png'
-import destLogo from '../assets/tokens/bomb.png'
+import destLogo from '../assets/tokens/RING.svg'
 import { tokenBalance,getSwaps } from '../functions/useStatistics';
 import {  REACT_APP_SUPPORTED_CHAINID,  TOKEN, WETH9, PEG,MINSLIPPAGE,SWAPFEES,FEEWALLET } from "../appconfig";
 import { useWeb3Context } from "../hooks";
@@ -186,7 +186,7 @@ export default function SingleSwap(props) {
             const swapParameters = await getSwaps(amount);
             const amountOutUsd = new BigNumber(swapParameters.data.amountOutUsd);
             const outputAmount = new BigNumber(swapParameters.data.outputAmount);
-            const priceInUsd = amountOutUsd.multipliedBy(amount).dividedBy(outputAmount);
+            const priceInUsd = amountOutUsd.multipliedBy(amount).dividedBy(outputAmount).dividedBy(1e13);
             const coeff = amountOutUsd.dividedBy(priceInUsd);  // USD per TOKEN 
             setDestPriceCoeff(coeff);
             setDestPrice(priceInUsd.toFixed(4));

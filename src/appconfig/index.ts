@@ -25,6 +25,8 @@ export enum NetworkId {
   AVALANCHE_FUJI_TESTNET = 43113,
   // AVALANCHE_MAINNET = 43114,
 
+  BSCMAINNET = 56,
+  
   Localhost = 1337,
 }
 
@@ -70,123 +72,7 @@ export declare enum ChainId {
   ARBITRUM_TESTNET = 421611,
   BTTC = 199,
   VELAS = 106
-}
-/*
-export const ADD_NETWORK_PARAMS: {
-  [chainId in ChainId]?: {
-    chainId: string
-    chainName: string
-    nativeCurrency: {
-      name: string
-      symbol: string
-      decimals: number
-    }
-    rpcUrls: string[]
-    blockExplorerUrls: string[]
-  }
-} = {
-  [ChainId.MAINNET]: {
-    chainId: '0x1',
-    chainName: 'Ethereum',
-    nativeCurrency: {
-      name: 'Ethereum',
-      symbol: 'ETH',
-      decimals: 18,
-    },
-    rpcUrls: ['https://mainnet.infura.io/v3'],
-    blockExplorerUrls: ['https://etherscan.com'],
-  },
-  [ChainId.MATIC]: {
-    chainId: '0x89',
-    chainName: 'Polygon',
-    nativeCurrency: {
-      name: 'Matic',
-      symbol: 'MATIC',
-      decimals: 18,
-    },
-    rpcUrls: ['https://polygon.dmm.exchange/v1/mainnet/geth?appId=prod-dmm'],
-    blockExplorerUrls: ['https://polygonscan.com'],
-  },
-  [ChainId.BSCMAINNET]: {
-    chainId: '0x38',
-    chainName: 'BSC',
-    nativeCurrency: {
-      name: 'BNB',
-      symbol: 'BNB',
-      decimals: 18,
-    },
-    rpcUrls: ['https://bsc.dmm.exchange/v1/mainnet/geth?appId=prod-dmm-interface'],
-    blockExplorerUrls: ['https://bscscan.com'],
-  },
-  [ChainId.AVAXMAINNET]: {
-    chainId: '0xA86A',
-    chainName: 'Avalanche',
-    nativeCurrency: {
-      name: 'AVAX',
-      symbol: 'AVAX',
-      decimals: 18,
-    },
-    rpcUrls: ['https://avalanche.dmm.exchange/v1/mainnet/geth?appId=prod-dmm'],
-    blockExplorerUrls: ['https://snowtrace.io'],
-  },
-  [ChainId.FANTOM]: {
-    chainId: '0xFA',
-    chainName: 'FANTOM',
-    nativeCurrency: {
-      name: 'FTM',
-      symbol: 'FTM',
-      decimals: 18,
-    },
-    rpcUrls: ['https://rpc.ftm.tools'],
-    blockExplorerUrls: ['https://ftmscan.com'],
-  },
-  [ChainId.CRONOS]: {
-    chainId: '0x19',
-    chainName: 'Cronos',
-    nativeCurrency: {
-      name: 'CRO',
-      symbol: 'CRO',
-      decimals: 18,
-    },
-    rpcUrls: ['https://evm-cronos.crypto.org'],
-    blockExplorerUrls: ['https://cronos.crypto.org/explorer'],
-  },
-
-  [ChainId.ARBITRUM]: {
-    chainId: '0xa4b1',
-    chainName: 'Arbitrum',
-    nativeCurrency: {
-      name: 'ETH',
-      symbol: 'ETH',
-      decimals: 18,
-    },
-    rpcUrls: ['https://arb1.arbitrum.io/rpc'],
-    blockExplorerUrls: ['https://arbiscan.io'],
-  },
-  [ChainId.BTTC]: {
-    chainId: '0xc7',
-    chainName: 'BitTorrent',
-    nativeCurrency: {
-      name: 'BTT',
-      symbol: 'BTT',
-      decimals: 18,
-    },
-    rpcUrls: ['https://bttc.dev.kyberengineering.io'],
-    blockExplorerUrls: ['https://bttcscan.com'],
-  },
-  [ChainId.VELAS]: {
-    chainId: '0x6a',
-    chainName: 'Velas',
-    nativeCurrency: {
-      name: 'VLX',
-      symbol: 'VLX',
-      decimals: 18,
-    },
-    rpcUrls: ['https://evmexplorer.velas.com/rpc'],
-    blockExplorerUrls: ['https://evmexplorer.velas.com/'],
-  },
-}
-*/
+} 
 
 export const NETWORKS: { [key: number]: INetwork } = {
   1: {
@@ -258,10 +144,10 @@ export const WCRO = '0x5c7f8a570d578ed84e63fdfa7b1ee72deae1ae23'
 
 export const TOKEN = new Token(
   REACT_APP_SUPPORTED_CHAINID,
-  '0x522348779DCb2911539e76A1042aA922F9C47Ee3',
+  '0x021988d2c89b1A9Ff56641b2F247942358FF05c9',
   18,
-  'BOMB',
-  'BOMB'
+  'RING',
+  'RING'
 );
 export const WETH9 = new Token(
   REACT_APP_SUPPORTED_CHAINID,
